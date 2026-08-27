@@ -6,7 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased] - 2026-08-14
+## [Unreleased] - 2026-08-28
+
+### 三级运（Pratyantardasha）纪律补齐
+
+- `vedic-core/resources/house_framework.md`「时间窗纪律」canonical 回补 A2 时间窗人话锚（`e5083fe`）。
+- `vedic-career` / `vedic-love` / `vedic-synastry` 三份压缩副本补齐 PD 层，与 canonical 对齐（`c1199f6`）。此前三者停在"MD×AD 叠加窗 ≤3 年"、对三级运零提及，与 07-31 已升到三层（MD×AD×PD）的 canonical 脱节近一个月——根因是一致性检查的必备标记清单停在旧口径，同批已补 `原生PD` 标记。
+- 重建 `build/anchored/` 锚产物，`source_commit=e5083fe`（`a1173db`）。
+
+### 小火人文本卡片导出
+
+- 新增 `make_xiaohuo_person_card.py`，从 `structured_data.md` 生成文本人物卡片（`4f5d4ab`）。
+- 卡片补出当前 Pratyantardasha 行；Lagna 改为固定 `Lagna: 星座; H宫; 度数（上升）` 单行格式，避免下游对话模型漏读（`cadb170`）。
 
 ### Comprehensive multilingual repository documentation
 
