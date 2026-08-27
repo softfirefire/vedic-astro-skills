@@ -205,8 +205,9 @@ Layer 1+2 → 写入 reports/02_interaction_matrix.md
 窗口必须分别显示 A 与 B 各自依据，不只给"共同窗口"。
 双方 MD/AD 时间窗口必须引用 vedic-core/resources/house_framework.md 的大运正负面判断
 规则执行正/负面条件判定，时间节点带括号标注推导依据；并守其「时间窗纪律」节
-（事件窗=MD×AD≤3年、大运级只作背景趋势；任一方 structured_data 无「Chara Dasha 时间线」节时
-❌禁凭通识心算 Chara、❌禁宣称"双系统共振/确认"）。
+（事件窗至少=MD×AD 阶段窗、大运级只作背景趋势；一旦点名月份/季度内先后/任何窄于完整AD的
+窗口，必须引 calculator 原生PD，PD不可用时明确降级、❌禁用AD冒充月级精度；任一方
+structured_data 无「Chara Dasha 时间线」节时❌禁凭通识心算 Chara、❌禁宣称"双系统共振/确认"）。
 → 写入 reports/03_timing.md
 
 ---

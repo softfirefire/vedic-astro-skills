@@ -237,8 +237,9 @@ description: "Analyze relationship patterns, emotional needs, partnership capaci
   ✅ "2028-2031年是感情窗口期（Venus=L2+L9, 入庙, 正面3/负面0→正面期）"
   ❌ "2028-2031年是感情窗口期"（无推导依据）
 - 时间窗纪律（见 house_framework「时间窗纪律」节，一并执行）：凡"桃花期/窗口期"等
-  事件性措辞必须落 MD×AD 叠加窗≤3年（引速查表AD行/时间轴分行）；大运级信号只写
-  "背景趋势期"；回顾过去感情 Dasha 必须双向列正负面表现
+  事件性措辞至少落 MD×AD 阶段窗（引速查表AD行/时间轴分行）；一旦点名月份/季度内先后/
+  任何窄于完整AD的窗口，必须引 calculator 原生PD，PD不可用时明确降级、❌禁用AD冒充月级
+  精度；大运级信号只写"背景趋势期"；回顾过去感情 Dasha 必须双向列正负面表现
 
 ---
 
