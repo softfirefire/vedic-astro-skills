@@ -182,9 +182,36 @@ def compute_sections(text: str, abbr: str, relname: str):
 
 
 def git_commit(repo: Path) -> str:
+    """产物自报的 source_commit = 最后一次改动被锚文件的提交，**不是 HEAD**。
+
+    2026-09-03 修：原实现取 `rev-parse HEAD`，而收尾链是
+    「改规则 → commit 规则 → 重跑本脚本 → commit 锚产物」——提交锚产物本身会推进
+    HEAD，此后任何一次重跑都会把 source_commit 写成那个**产物提交**，指向的不再是
+    规则内容。实测复现过：开源 6d9054d→4884937、Pro 62483b5→0eaa75f，锚数与其余
+    字段全同 = 纯指纹漂移。产品侧 vendor build/anchored/ 时正是读这个字段锁版本，
+    漂了就锁错。改为只看 SKILL_REL 子树的最后一次提交，指纹跟规则内容走。
+
+    ⚠️ pathspec 必须精确到 FILES 里那 6 个被锚文件，**不能只给 SKILL_REL 子树**。
+    子树里还有 scripts/、__pycache__/ 等非规则内容：A2 那批在 Pro 仓 untrack 了
+    vedic-core/scripts/__pycache__/*.pyc，用子树 pathspec 立刻把指纹顶成那个提交
+    （实测 62483b5 → ffd112f）。指纹要跟的是"产品消费的规则正文"，不是目录活动。
+
+    副作用（已知且可接受）：本脚本自身、scripts/、其他 skill 的改动不再 bump 指纹
+    ——本来也不该 bump，那些改动对被锚规则内容零影响。
+    """
+    rel = str(SKILL_REL).replace('\\', '/')
+    pathspec = [f'{rel}/{f}' for f in FILES]   # 开源仓无 prediction_rules.md，不匹配即忽略
     try:
-        return subprocess.run(['git', '-C', str(repo), 'rev-parse', 'HEAD'],
+        r = subprocess.run(
+            ['git', '-C', str(repo), 'log', '-1', '--format=%H', '--', *pathspec],
+            capture_output=True, text=True)
+        out = r.stdout.strip()[:12]
+        if out:
+            return out
+        # 子树无提交历史（新仓/浅克隆）——回落 HEAD 但明确标注，别让它冒充干净指纹
+        head = subprocess.run(['git', '-C', str(repo), 'rev-parse', 'HEAD'],
                               capture_output=True, text=True).stdout.strip()[:12]
+        return f'{head}-HEAD-fallback' if head else 'unknown'
     except Exception:
         return 'unknown'
 

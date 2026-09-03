@@ -28,6 +28,16 @@ All notable changes to this project will be documented in this file.
 - 移除 `sync_all.ps1`（Windows-only，方向为「本地目录 → 仓」，且会自动 commit + push）。
   改由上述 `skill_sync.py` 承担，方向反转为「仓 → 本机」，提交与推送一律手工。
 
+### 锚产物指纹修正：`source_commit` 不再指向产物提交
+
+- `build_anchored.py` 的 `source_commit` 改为「最后一次改动**被锚文件**的提交」，此前取
+  `git rev-parse HEAD`。收尾链是「改规则 → 提交规则 → 重跑锚脚本 → 提交锚产物」，**提交锚
+  产物本身会推进 HEAD**，此后任何一次重跑都会把 `source_commit` 写成那个产物提交，指向的
+  不再是规则内容。下游 vendor `build/anchored/` 时正是读这个字段锁版本，漂了就锁错。
+- pathspec 精确到被锚的 6 个文件，不用目录。用 `vedic-core/` 整个子树会把 `scripts/`、
+  `__pycache__/` 的活动也算进去——同批 untrack `.pyc` 就实测顶偏过一次。
+- 本次修正**不改变当前指纹**（开源 `6d9054d29335`，305 锚 / 121 节），仅消除后续漂移。
+
 ### Parivartana 扫描口径修正
 
 - `vedic-core/resources/` Parivartana 扫描改读 calculator 的互溶对照表，分类与 `yogas.md`
