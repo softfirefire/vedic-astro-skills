@@ -8,10 +8,10 @@
 工作全部直接进仓、GitHub 一直是最新的，腐坏的是那个从不被读的 Windows 源目录。
 旧方向留着就是回退炸弹：源一旦落后，跑一次就用旧覆盖新，还自动 push 出去。
 
-真源 = <repo>/antigravity/skills/    （build_anchored.py 的 SKILL_REL 也指这里）
+真源 = <repo>/skills/    （build_anchored.py 的 SKILL_REL 也指这里）
 
 子命令：
-  platforms  仓内 antigravity → claude-code + codex
+  platforms  仓内 skills/ → claude-code + codex
   install    仓 → 本机 ~/.claude/skills
   all        先 platforms 后 install
 
@@ -30,8 +30,13 @@ import shutil
 import sys
 from pathlib import Path
 
-CANON_PLATFORM = 'antigravity'
-PLATFORMS = ['antigravity', 'claude-code', 'codex']
+# 2026-09-04：真源目录 antigravity/skills/ → skills/。
+# ⚠️ 这不只是改名，是修一个概念错误：真源本来就不是「Antigravity 这个平台的发行面」，
+#    它是**所有发行面的来源**。旧结构把它塞进 PLATFORMS 列表里当成员之一，再靠
+#    `if plat == CANON_PLATFORM: continue` 把自己跳过去——这是代码在绕开自己的分类错误。
+#    现在 CANON_DIR 与 PLATFORMS 彻底分开，循环里那条 continue 也随之删掉。
+CANON_DIR = 'skills'                    # 真源，不是平台
+PLATFORMS = ['claude-code', 'codex']    # 由真源派生的发行面
 
 # 只同步这些。codex 的 agents/openai.yaml 与各平台 README 是手工层，不在此列
 # = 不会被覆盖（它们由 consistency_lint 第8组守门）。
@@ -60,12 +65,10 @@ SKILLS = [
     ('vedic-core',       'vedic-core-pro',   'pro'),
 ]
 
-# 2026-09-04：停装 Antigravity（~/.gemini/config/skills）——创始人已不再使用该端。
-# ⚠️ 仓内 antigravity/ 目录不能删：它是 CANON_PLATFORM 真源，claude-code/ 与 codex/
-#    都从它派生，build_anchored.SKILL_REL 和 consistency_lint 的全部路径也指它。
-#    这里停的只是"往本机 Antigravity 安装点铺一份"，与仓库结构无关。
-# ⚠️ 本机 ~/.gemini/config/skills 下的旧副本不会被本脚本删除，但从此不再更新——
-#    它们是僵尸副本，会停在停装当天的口径。要么手工删掉，要么别再从那儿运行。
+# 2026-09-04：停装 Antigravity（~/.gemini/config/skills）——创始人已不再使用该端，
+# 本机旧副本同日手工删除，不留僵尸（僵尸副本会停在停装当天的口径，且外观与在用的一样）。
+# ⚠️ 停装 ≠ 不兼容：Antigravity、以及各家读 Claude Skill 格式的客户端，照样可以从仓内
+#    skills/ 手工复制安装，见 README 安装节。这里只是不再自动往那个本机路径铺一份。
 INSTALL_ROOTS = [
     ('claude', Path.home() / '.claude' / 'skills'),
 ]
@@ -132,14 +135,12 @@ def find_orphans(src: Path, dst: Path, label: str):
 def cmd_platforms(repos, dry: bool) -> int:
     total = 0
     for label, repo in repos:
-        canon = repo / CANON_PLATFORM / 'skills'
+        canon = repo / CANON_DIR
         if not canon.exists():
-            print(f'  [SKIP] {label}: 无 {CANON_PLATFORM}/skills')
+            print(f'  [SKIP] {label}: 无 {CANON_DIR}/')
             continue
         for name in sorted(d.name for d in canon.iterdir() if d.is_dir()):
             for plat in PLATFORMS:
-                if plat == CANON_PLATFORM:
-                    continue
                 # 目标不存在也建：新增 skill 才不会漏掉某个平台。
                 # codex 会因此缺 agents/openai.yaml，由 lint 第8组报出来提醒补手工层。
                 total += sync_skill(canon / name, repo / plat / 'skills' / name,
@@ -156,7 +157,7 @@ def cmd_install(repo_open: Path, repo_pro: Path, dry: bool, prune: bool) -> int:
             print(f'  [SKIP] {dst_name}: 归属仓不可用'
                   f'{"（Pro 私有仓未克隆）" if kind == "pro" else ""}')
             continue
-        src = repo / CANON_PLATFORM / 'skills' / src_name
+        src = repo / CANON_DIR / src_name
         if not src.exists():
             print(f'  [SKIP] {dst_name}: {src} 不存在')
             continue
@@ -186,8 +187,8 @@ def check_shared_parity(repo_open: Path, repo_pro: Path):
     for src_name, _, kind in SKILLS:
         if kind != 'shared':
             continue
-        a = repo_open / CANON_PLATFORM / 'skills' / src_name
-        b = repo_pro / CANON_PLATFORM / 'skills' / src_name
+        a = repo_open / CANON_DIR / src_name
+        b = repo_pro / CANON_DIR / src_name
         if not a.exists() or not b.exists():
             continue
         for rel in iter_files(a):

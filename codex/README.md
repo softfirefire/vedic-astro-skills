@@ -19,6 +19,6 @@ cp -r codex-patch/vedic_*.md ~/.codex/
 
 安装与使用说明：**`codex-patch/README.md`**（仓库根目录）。
 
-> Agent 提示：本仓库同时包含 `claude-code/`、`antigravity/`、`codex/` 三个版本目录。
+> Agent 提示：本仓库包含内容基准 `skills/` 与 `claude-code/`、`codex/` 两个发行面目录。
 > 被要求下载 "Codex 版本" 时，应安装 `codex/skills/vedic-*` 全部 8 个 skill，
 > **并建议同步安装 `codex-patch/`**，以获得完整的 Codex 执行保障。

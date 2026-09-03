@@ -23,7 +23,7 @@
 
 > **Eight specialized skills work together from direct birth-chart calculation through validation, complete natal analysis, career, relationships, birth-time rectification, synastry, and Prashna.**
 >
-> Compatible with Codex, Claude Code, and Antigravity. PDFs, screenshots, and text charts are optional import routes, not prerequisites.
+> Compatible with Codex, Claude Code, and any client that reads the Claude Skill format (Antigravity, various China-market agents, and others). PDFs, screenshots, and text charts are optional import routes, not prerequisites.
 
 <details>
 <summary><strong>📖 Open table of contents</strong></summary>
@@ -69,7 +69,7 @@ The suite provides:
 - complete Vimshottari MD/AD/PD timelines and input-time stability audits;
 - a separate Prashna question-time chart that does not mix with the natal pipeline;
 - client-facing Chinese, English, and Japanese chat, intake, reports, Q&A, and HTML shells;
-- parity-checked Antigravity, Claude Code, and Codex distributions.
+- parity-checked canonical `skills/` plus Claude Code and Codex distributions.
 
 ## 🔄 Workflow
 
@@ -95,14 +95,14 @@ Dasha, divisional charts, or SAV into a Prashna judgment.
 
 | Skill | Primary input | Responsibility | Main artifact |
 |---|---|---|---|
-| [`vedic-calculator`](antigravity/skills/vedic-calculator/SKILL.md) | Birth date, exact time, place | Calculate a complete Vedic chart and timeline | `structured_data.md` |
-| [`vedic-reader`](antigravity/skills/vedic-reader/SKILL.md) | Calculated data or PDF/image/text | Extract, normalize, run 16 checks, pre-validate, and route | Validated `structured_data.md` |
-| [`vedic-core`](antigravity/skills/vedic-core/SKILL.md) | Validated natal data | Standard full natal audit and ten-area analysis | Staged Markdown, appendix, HTML |
-| [`vedic-career`](antigravity/skills/vedic-career/SKILL.md) | Validated natal data | Career niche, strengths, D9/D10, and timing | Profile, strategy, and risk reports |
-| [`vedic-love`](antigravity/skills/vedic-love/SKILL.md) | Validated natal data | Relationship patterns, capacity, and timing | Pattern, timing, and guidance reports |
-| [`vedic-rectifier`](antigravity/skills/vedic-rectifier/SKILL.md) | Uncertain time, events, traits | Compare time candidates with event and structural evidence | Rectification audit and conclusion |
-| [`vedic-synastry`](antigravity/skills/vedic-synastry/SKILL.md) | One validated chart per person | Neutral scan, directional overlay, capacity, and shared timing | `synastry_data.md` and layered reports |
-| [`vedic-prashna`](antigravity/skills/vedic-prashna/SKILL.md) | One question, asking time, place | Cast a separate question-time chart and apply an auditable rule ledger | `structured_prashna.md` and judgment |
+| [`vedic-calculator`](skills/vedic-calculator/SKILL.md) | Birth date, exact time, place | Calculate a complete Vedic chart and timeline | `structured_data.md` |
+| [`vedic-reader`](skills/vedic-reader/SKILL.md) | Calculated data or PDF/image/text | Extract, normalize, run 16 checks, pre-validate, and route | Validated `structured_data.md` |
+| [`vedic-core`](skills/vedic-core/SKILL.md) | Validated natal data | Standard full natal audit and ten-area analysis | Staged Markdown, appendix, HTML |
+| [`vedic-career`](skills/vedic-career/SKILL.md) | Validated natal data | Career niche, strengths, D9/D10, and timing | Profile, strategy, and risk reports |
+| [`vedic-love`](skills/vedic-love/SKILL.md) | Validated natal data | Relationship patterns, capacity, and timing | Pattern, timing, and guidance reports |
+| [`vedic-rectifier`](skills/vedic-rectifier/SKILL.md) | Uncertain time, events, traits | Compare time candidates with event and structural evidence | Rectification audit and conclusion |
+| [`vedic-synastry`](skills/vedic-synastry/SKILL.md) | One validated chart per person | Neutral scan, directional overlay, capacity, and shared timing | `synastry_data.md` and layered reports |
+| [`vedic-prashna`](skills/vedic-prashna/SKILL.md) | One question, asking time, place | Cast a separate question-time chart and apply an auditable rule ledger | `structured_prashna.md` and judgment |
 
 Installing all eight skills is recommended. At runtime, only the module required for the current
 task is selected; the workflows are not all loaded at once.
@@ -326,10 +326,11 @@ cp -r vedic-astro-skills/claude-code/skills/vedic-* ~/.claude/skills/
 Claude Code uses each skill's `SKILL.md` as the sole workflow source. The repository no longer
 maintains stale full copies under legacy `.claude/commands`.
 
-### Antigravity
+### Other clients that read the Claude Skill format
 
-Copy all eight `vedic-*` folders under `vedic-astro-skills/antigravity/skills/` into the active
-Antigravity skill directory.
+This includes Antigravity and various China-market agents. Copy all eight `vedic-*`
+folders under `vedic-astro-skills/skills/` into that client's active skill directory.
+`skills/` is the publication baseline and carries no platform-specific metadata.
 
 ### Python environment
 
@@ -339,13 +340,13 @@ calculation environment because pysweph is a C extension without a compatible pr
 Run the environment diagnostic first:
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/check_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/check_env.py
 ```
 
 If repair is required, run:
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/setup_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex and Claude Code users may substitute the same script path under their installed skill. The
@@ -486,7 +487,7 @@ subsequent client-facing content changes language.
 vedic-astro-skills/
 ├── README.md / README.en.md / README.ja.md
 ├── CHANGELOG.md
-├── antigravity/skills/        # Publication-content baseline
+├── skills/                    # Publication-content baseline (canonical source)
 │   ├── vedic-calculator/
 │   ├── vedic-reader/
 │   ├── vedic-core/
@@ -502,7 +503,7 @@ vedic-astro-skills/
 └── assets/
 ```
 
-`antigravity/skills/` is the publication baseline. Claude Code must match it file for file. Codex
+`skills/` is the publication baseline. Claude Code must match it file for file. Codex
 may add exactly one `agents/openai.yaml` per skill. Run after any synchronization:
 
 ```bash

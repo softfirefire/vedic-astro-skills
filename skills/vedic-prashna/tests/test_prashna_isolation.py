@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 # 从本文件位置推导 skills 根，不再硬编码机器路径（Mac 也要能跑）。
-#   仓布局   <repo>/antigravity/skills/vedic-prashna/tests/本文件
+#   仓布局   <repo>/skills/vedic-prashna/tests/本文件
 #   安装布局 ~/.claude/skills/vedic-prashna/tests/本文件
 # 两种布局下 parents[2] 都是 skills 根。
 # VEDIC_SKILLS_ROOT 可覆盖：consistency_lint 靠它对开源仓/Pro 仓各跑一遍——

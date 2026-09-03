@@ -125,8 +125,8 @@ description: "Calculate a complete Vedic/Jyotish natal chart directly from birth
 import sys, os
 
 # ⚠️ 动态路径：AI根据skill安装位置自动填写
-# Antigravity 示例: C:\Users\用户名\.gemini\config\skills\vedic-calculator\scripts
 # Claude Code 示例: ~/.claude/skills/vedic-calculator/scripts
+# 其它客户端: 换成该客户端实际的 skill 安装目录下的同名路径
 SCRIPTS_DIR = r"<vedic-calculator skill 的 scripts 目录绝对路径>"
 sys.path.insert(0, SCRIPTS_DIR)
 

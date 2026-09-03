@@ -30,7 +30,7 @@ from pathlib import Path
 # 产物清单与 Step 编号，因此住 Pro 私有仓。
 OPEN = Path(__file__).resolve().parent
 PRO = OPEN.parent / 'vedic-astro-skills-pro'   # 可用 --pro 覆盖
-SKILL_REL = Path('antigravity/skills/vedic-core')
+SKILL_REL = Path('skills/vedic-core')
 # 覆盖范围（第七节第1条；report_rules 产品不消费，略）
 # prediction_rules 是 Pro 独有（开源版无此文件，build 时会打一行 [WARN] missing，属预期）。
 # 补入原因：本清单当初按开源版的文件构成列，Pro 复用同一份 FILES，导致 Pro 最核心的增量

@@ -23,7 +23,7 @@
 
 > **八个专精 Skill 协同工作：从出生信息直接排盘，到数据校验、完整本命分析、职业、感情、出生时间校准、双人合盘与 Prashna。**
 >
-> 兼容 Codex、Claude Code 和 Antigravity；PDF、截图与文本星盘是可选导入方式，不是使用前提。
+> 兼容 Codex、Claude Code，以及任何读取 Claude Skill 格式的客户端（Antigravity、各类国产 agent 等）；PDF、截图与文本星盘是可选导入方式，不是使用前提。
 
 <details>
 <summary><strong>📖 展开目录</strong></summary>
@@ -65,7 +65,7 @@
 - 完整 Vimshottari MD/AD/PD 时间线与输入时间稳定性审计；
 - 独立的 Prashna 提问时刻盘，不与本命分析混跑；
 - 中文、英文、日文的对话、采集、问卷、报告、Q&A 与 HTML 外壳；
-- Codex、Claude Code、Antigravity 三个发行面保持内容一致。
+- 真源 `skills/` 与 Codex、Claude Code 两个发行面保持内容一致。
 
 ## 🔄 整体工作流
 
@@ -91,14 +91,14 @@ flowchart LR
 
 | Skill | 主要输入 | 核心职责 | 主要产物 |
 |---|---|---|---|
-| [`vedic-calculator`](antigravity/skills/vedic-calculator/SKILL.md) | 出生日期、准确时间、地点 | 计算完整吠陀星盘与时间线 | `structured_data.md` |
-| [`vedic-reader`](antigravity/skills/vedic-reader/SKILL.md) | 计算结果，或 PDF、截图、文本 | 提取、标准化、16 条校验、验前事与路由 | 已验证的 `structured_data.md` |
-| [`vedic-core`](antigravity/skills/vedic-core/SKILL.md) | 已验证的本命数据 | 标准版完整本命审计与十大板块 | 分阶段 Markdown、技术附录、HTML |
-| [`vedic-career`](antigravity/skills/vedic-career/SKILL.md) | 已验证的本命数据 | 职业生态位、天赋格局、D9/D10 与时机 | 职业画像、策略、风险报告 |
-| [`vedic-love`](antigravity/skills/vedic-love/SKILL.md) | 已验证的本命数据 | 关系模式、情感需求、关系承载与时间窗口 | 原盘、时机、建议报告 |
-| [`vedic-rectifier`](antigravity/skills/vedic-rectifier/SKILL.md) | 不确定出生时间、重大事件、个人特质 | 扫描候选时间并用事件与结构证据校准 | 校准过程与结论报告 |
-| [`vedic-synastry`](antigravity/skills/vedic-synastry/SKILL.md) | 两个人各一份已验证本命数据 | 中性平扫、双向叠盘、关系承载与共同时间 | `synastry_data.md` 与分层报告 |
-| [`vedic-prashna`](antigravity/skills/vedic-prashna/SKILL.md) | 一个具体问题、提问时刻、地点 | 建立独立提问时刻盘并按规则账本判断 | `structured_prashna.md` 与判读单 |
+| [`vedic-calculator`](skills/vedic-calculator/SKILL.md) | 出生日期、准确时间、地点 | 计算完整吠陀星盘与时间线 | `structured_data.md` |
+| [`vedic-reader`](skills/vedic-reader/SKILL.md) | 计算结果，或 PDF、截图、文本 | 提取、标准化、16 条校验、验前事与路由 | 已验证的 `structured_data.md` |
+| [`vedic-core`](skills/vedic-core/SKILL.md) | 已验证的本命数据 | 标准版完整本命审计与十大板块 | 分阶段 Markdown、技术附录、HTML |
+| [`vedic-career`](skills/vedic-career/SKILL.md) | 已验证的本命数据 | 职业生态位、天赋格局、D9/D10 与时机 | 职业画像、策略、风险报告 |
+| [`vedic-love`](skills/vedic-love/SKILL.md) | 已验证的本命数据 | 关系模式、情感需求、关系承载与时间窗口 | 原盘、时机、建议报告 |
+| [`vedic-rectifier`](skills/vedic-rectifier/SKILL.md) | 不确定出生时间、重大事件、个人特质 | 扫描候选时间并用事件与结构证据校准 | 校准过程与结论报告 |
+| [`vedic-synastry`](skills/vedic-synastry/SKILL.md) | 两个人各一份已验证本命数据 | 中性平扫、双向叠盘、关系承载与共同时间 | `synastry_data.md` 与分层报告 |
+| [`vedic-prashna`](skills/vedic-prashna/SKILL.md) | 一个具体问题、提问时刻、地点 | 建立独立提问时刻盘并按规则账本判断 | `structured_prashna.md` 与判读单 |
 
 建议完整安装八个 Skill。实际运行时按任务调用相应模块，不会把所有工作流同时加载。
 
@@ -314,10 +314,11 @@ cp -r vedic-astro-skills/claude-code/skills/vedic-* ~/.claude/skills/
 Claude Code 以各 Skill 的 `SKILL.md` 为唯一工作流来源，不再维护旧式
 `.claude/commands` 全量副本。
 
-### Antigravity
+### 其它读取 Claude Skill 格式的客户端
 
-把 `vedic-astro-skills/antigravity/skills/` 下的八个 `vedic-*` 文件夹复制到实际
-使用的 Antigravity Skill 目录。
+包括 Antigravity 以及各类国产 agent：把 `vedic-astro-skills/skills/` 下的八个
+`vedic-*` 文件夹复制到该客户端实际使用的 Skill 目录即可。`skills/` 是发布内容基准，
+不含任何平台专属元数据。
 
 ### Python 环境
 
@@ -327,13 +328,13 @@ Claude Code 以各 Skill 的 `SKILL.md` 为唯一工作流来源，不再维护�
 首次使用先运行诊断：
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/check_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/check_env.py
 ```
 
 如果诊断要求修复环境，再运行：
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/setup_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex 或 Claude Code 用户也可以把路径换成对应安装目录中的同名脚本。`setup_env.py`
@@ -479,7 +480,7 @@ python report_builder.py <report-folder> --name "山田" --lang ja
 vedic-astro-skills/
 ├── README.md / README.en.md / README.ja.md
 ├── CHANGELOG.md
-├── antigravity/skills/        # 发布内容基准
+├── skills/                    # 发布内容基准（真源）
 │   ├── vedic-calculator/
 │   ├── vedic-reader/
 │   ├── vedic-core/
@@ -495,7 +496,7 @@ vedic-astro-skills/
 └── assets/
 ```
 
-`antigravity/skills/` 是发布内容基准。Claude Code 发行版必须逐文件一致；Codex 只
+`skills/` 是发布内容基准。Claude Code 发行版必须逐文件一致；Codex 只
 允许每个 Skill 额外包含一个 `agents/openai.yaml`。修改或同步后运行：
 
 ```bash

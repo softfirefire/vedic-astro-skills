@@ -23,7 +23,7 @@
 
 > **8つの専門 Skill が連携し、出生情報からの直接計算、データ検証、総合出生図分析、キャリア、恋愛・関係性、出生時刻修正、二人のチャート比較、Prashna までを扱います。**
 >
-> Codex、Claude Code、Antigravity に対応します。PDF、画像、テキストのチャートは任意の読み込み方法であり、必須ではありません。
+> Codex、Claude Code、および Claude Skill 形式を読み込むあらゆるクライアント（Antigravity、各種の中国製 agent など）に対応します。PDF、画像、テキストのチャートは任意の読み込み方法であり、必須ではありません。
 
 <details>
 <summary><strong>📖 目次を開く</strong></summary>
@@ -67,7 +67,7 @@ JHora などの PDF、スクリーンショット、テキスト出力も読み�
 - 完全な Vimshottari MD/AD/PD 時系列と出生時刻入力の安定性監査
 - 本命分析と混在しない独立したプラシュナ（質問時刻図）
 - 中国語・英語・日本語の会話、入力、質問票、レポート、Q&A、HTML 外枠
-- Antigravity、Claude Code、Codex の3配布面に対する整合性チェック
+- 内容基準 `skills/` と Claude Code、Codex の2配布面に対する整合性チェック
 
 ## 🔄 全体ワークフロー
 
@@ -93,14 +93,14 @@ flowchart LR
 
 | Skill | 主な入力 | 役割 | 主な成果物 |
 |---|---|---|---|
-| [`vedic-calculator`](antigravity/skills/vedic-calculator/SKILL.md) | 生年月日、正確な時刻、出生地 | 完全な出生図と時系列を計算 | `structured_data.md` |
-| [`vedic-reader`](antigravity/skills/vedic-reader/SKILL.md) | 計算済みデータ、PDF、画像、テキスト | 抽出、標準化、16項目の検証、事前検証、ルーティング | 検証済み `structured_data.md` |
-| [`vedic-core`](antigravity/skills/vedic-core/SKILL.md) | 検証済み本命データ | Standard の完全出生図監査と10領域分析 | 段階別 Markdown、技術付録、HTML |
-| [`vedic-career`](antigravity/skills/vedic-career/SKILL.md) | 検証済み本命データ | キャリアの方向性、役割適性、D9/D10、時期 | 人物像・戦略・リスクのレポート |
-| [`vedic-love`](antigravity/skills/vedic-love/SKILL.md) | 検証済み本命データ | 恋愛・関係性のパターン、維持力、時期 | 関係パターン・時期・ガイダンスのレポート |
-| [`vedic-rectifier`](antigravity/skills/vedic-rectifier/SKILL.md) | 不確かな出生時刻、出来事、特性 | 候補時刻を出来事と構造証拠で比較 | 修正監査と結論レポート |
-| [`vedic-synastry`](antigravity/skills/vedic-synastry/SKILL.md) | 一人につき一つの検証済み出生図 | 中立スキャン、方向別作用、維持力、共通時期 | `synastry_data.md` と段階別レポート |
-| [`vedic-prashna`](antigravity/skills/vedic-prashna/SKILL.md) | 一つの質問、質問日時、場所 | 独立した質問時刻図と監査可能な判定根拠表 | `structured_prashna.md` と判定書 |
+| [`vedic-calculator`](skills/vedic-calculator/SKILL.md) | 生年月日、正確な時刻、出生地 | 完全な出生図と時系列を計算 | `structured_data.md` |
+| [`vedic-reader`](skills/vedic-reader/SKILL.md) | 計算済みデータ、PDF、画像、テキスト | 抽出、標準化、16項目の検証、事前検証、ルーティング | 検証済み `structured_data.md` |
+| [`vedic-core`](skills/vedic-core/SKILL.md) | 検証済み本命データ | Standard の完全出生図監査と10領域分析 | 段階別 Markdown、技術付録、HTML |
+| [`vedic-career`](skills/vedic-career/SKILL.md) | 検証済み本命データ | キャリアの方向性、役割適性、D9/D10、時期 | 人物像・戦略・リスクのレポート |
+| [`vedic-love`](skills/vedic-love/SKILL.md) | 検証済み本命データ | 恋愛・関係性のパターン、維持力、時期 | 関係パターン・時期・ガイダンスのレポート |
+| [`vedic-rectifier`](skills/vedic-rectifier/SKILL.md) | 不確かな出生時刻、出来事、特性 | 候補時刻を出来事と構造証拠で比較 | 修正監査と結論レポート |
+| [`vedic-synastry`](skills/vedic-synastry/SKILL.md) | 一人につき一つの検証済み出生図 | 中立スキャン、方向別作用、維持力、共通時期 | `synastry_data.md` と段階別レポート |
+| [`vedic-prashna`](skills/vedic-prashna/SKILL.md) | 一つの質問、質問日時、場所 | 独立した質問時刻図と監査可能な判定根拠表 | `structured_prashna.md` と判定書 |
 
 8つをまとめてインストールすることを推奨します。実行時には現在の依頼に必要な Skill
 だけが選択され、すべてのワークフローが同時に読み込まれるわけではありません。
@@ -316,10 +316,11 @@ cp -r vedic-astro-skills/claude-code/skills/vedic-* ~/.claude/skills/
 Claude Code は各 Skill の `SKILL.md` を唯一のワークフロー真源として使います。古い
 `.claude/commands` の完全コピーは維持していません。
 
-### Antigravity
+### Claude Skill 形式を読み込むその他のクライアント
 
-`vedic-astro-skills/antigravity/skills/` にある8つの `vedic-*` フォルダを、実際に使用する
-Antigravity の Skill ディレクトリへコピーしてください。
+Antigravity や各種の中国製 agent が該当します。`vedic-astro-skills/skills/` にある8つの
+`vedic-*` フォルダを、そのクライアントが実際に使用する Skill ディレクトリへコピーして
+ください。`skills/` は公開内容の基準であり、プラットフォーム固有のメタデータを含みません。
 
 ### Python 環境
 
@@ -329,13 +330,13 @@ Python **3.8～3.13** に対応します。pysweph は C 拡張で、対応す�
 最初に環境診断を実行します。
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/check_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/check_env.py
 ```
 
 修復が必要と表示された場合：
 
 ```bash
-python3 vedic-astro-skills/antigravity/skills/vedic-calculator/scripts/setup_env.py
+python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex または Claude Code では、インストール先にある同名スクリプトへパスを変更できます。
@@ -475,7 +476,7 @@ python report_builder.py <report-folder> --name "山田" --lang ja
 vedic-astro-skills/
 ├── README.md / README.en.md / README.ja.md
 ├── CHANGELOG.md
-├── antigravity/skills/        # 公開内容の基準
+├── skills/                    # 公開内容の基準（真源）
 │   ├── vedic-calculator/
 │   ├── vedic-reader/
 │   ├── vedic-core/
@@ -491,7 +492,7 @@ vedic-astro-skills/
 └── assets/
 ```
 
-`antigravity/skills/` が公開内容の基準です。Claude Code はファイル単位で一致し、Codex は各 Skill に
+`skills/` が公開内容の基準です。Claude Code はファイル単位で一致し、Codex は各 Skill に
 `agents/openai.yaml` を一つだけ追加できます。同期後に実行します。
 
 ```bash

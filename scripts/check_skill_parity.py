@@ -9,7 +9,9 @@ import sys
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CANONICAL = REPO_ROOT / "antigravity" / "skills"
+# 2026-09-04：真源目录 antigravity/skills/ → skills/。它不是某个平台的发行面，
+# 而是所有发行面的来源，故用中立名并去掉多余的一层。
+CANONICAL = REPO_ROOT / "skills"
 SURFACES = {
     "claude-code": REPO_ROOT / "claude-code" / "skills",
     "codex": REPO_ROOT / "codex" / "skills",
@@ -121,9 +123,9 @@ def main() -> int:
                 f"codex: {relative} default prompt does not invoke ${skill_name}"
             )
 
-    for surface_name in ("antigravity", "claude-code"):
+    for surface_name in ("skills", "claude-code"):
         surface_root = (
-            CANONICAL if surface_name == "antigravity" else SURFACES[surface_name]
+            CANONICAL if surface_name == "skills" else SURFACES[surface_name]
         )
         unexpected_agents = agent_files(surface_root)
         if unexpected_agents:
@@ -145,7 +147,7 @@ def main() -> int:
         return 1
 
     print(
-        f"[OK] {len(canonical_skills)} skills match across Antigravity, "
+        f"[OK] {len(canonical_skills)} skills match across canonical skills/, "
         "Claude Code, and Codex."
     )
     print("[OK] Codex has exactly one agents/openai.yaml per skill.")
