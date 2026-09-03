@@ -12,7 +12,7 @@
 
 子命令：
   platforms  仓内 antigravity → claude-code + codex
-  install    仓 → 本机 ~/.claude/skills + ~/.gemini/config/skills
+  install    仓 → 本机 ~/.claude/skills
   all        先 platforms 后 install
 
 ⚠️ 本脚本不做 git add/commit/push。旧脚本那段用 `2>$null` 吞掉所有错误、
@@ -60,9 +60,14 @@ SKILLS = [
     ('vedic-core',       'vedic-core-pro',   'pro'),
 ]
 
+# 2026-09-04：停装 Antigravity（~/.gemini/config/skills）——创始人已不再使用该端。
+# ⚠️ 仓内 antigravity/ 目录不能删：它是 CANON_PLATFORM 真源，claude-code/ 与 codex/
+#    都从它派生，build_anchored.SKILL_REL 和 consistency_lint 的全部路径也指它。
+#    这里停的只是"往本机 Antigravity 安装点铺一份"，与仓库结构无关。
+# ⚠️ 本机 ~/.gemini/config/skills 下的旧副本不会被本脚本删除，但从此不再更新——
+#    它们是僵尸副本，会停在停装当天的口径。要么手工删掉，要么别再从那儿运行。
 INSTALL_ROOTS = [
     ('claude', Path.home() / '.claude' / 'skills'),
-    ('gemini', Path.home() / '.gemini' / 'config' / 'skills'),
 ]
 
 
