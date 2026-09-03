@@ -49,6 +49,19 @@ All notable changes to this project will be documented in this file.
   → **下游无需因本次改名重新 vendor**。
 - 历史条目中的 `antigravity/` 路径**不回改**——它们记录的是当时为真的事实。
 
+### `skill_sync.py` 停止排除星历文件（潜伏型缺陷）
+
+- `EXCLUDE_DIRS` / `EXCLUDE_EXTS` 中的 `ephe` 与 `.se1` 已移除。这三个 `.se1` 是
+  `setup_env.fix_ephemeris_data` 的**优先级 1 数据源**——PyJHora 4.8.6 的 pip 包不含它们，
+  缺了就退到 Moshier 星历（精度下降）。排除星历等于让同步器永远不铺这份必需数据。
+- **此前无症状，是因为它是潜伏型**：现有端点的 `scripts/ephe/` 是 `sync_all.ps1` 时代铺下的
+  历史遗留，一直在，所以每次 `install` 都"看起来正常"。只有**全新端点首次装到空目录**才会缺，
+  届时 `setup_env` 退到网络下载分支，而那个 URL 已 404。换机、新建安装点会踩到。
+- `find_orphans` 对目标侧同样调 `iter_files`，被排除项在源与目标两侧都不可见，
+  故此前 `--prune` 不会误删已有星历——这也是缺陷一直没暴露的另一半原因。
+- 解除排除后各端点 ephe 内容本就一致，`copy_one` 比对即跳过：`all --dry-run` 实测
+  **0 个文件待同步**，磁盘零变动，只影响未来新端点。
+
 ---
 
 ## [Unreleased] - 2026-09-03

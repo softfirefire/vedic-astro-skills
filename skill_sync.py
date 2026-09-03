@@ -46,8 +46,14 @@ PLATFORMS = ['claude-code', 'codex']    # 由真源派生的发行面
 # 这类缺口的成因，故一并纳入。
 SYNC_ITEMS = ['SKILL.md', 'resources', 'scripts', 'requirements.txt', 'tests']
 
-EXCLUDE_DIRS = {'__pycache__', 'venv', 'ephe', '.git'}
-EXCLUDE_EXTS = {'.pyc', '.pyo', '.se1'}
+# 2026-09-04：把 ephe/ 与 .se1 移出排除名单。它们是 setup_env.fix_ephemeris_data
+# 的优先级 1 数据源（PyJHora 4.8.6 的 pip 包缺这三个 .se1，缺了就退到 Moshier）。
+# 排除的后果是潜伏型：现有端点的 ephe 是 sync_all.ps1 时代铺下的历史遗留，一直在，
+# 所以无症状；只有**全新端点首次 install 到空目录**才会缺，届时 setup_env 退到网络
+# 下载分支而该 URL 已 404。三处 ephe 内容本就相同，解除排除后 copy_one 比对即跳过，
+# 实际文件零变动。（find_orphans 对目标侧也调 iter_files，故此前 --prune 不会误删。）
+EXCLUDE_DIRS = {'__pycache__', 'venv', '.git'}
+EXCLUDE_EXTS = {'.pyc', '.pyo'}
 
 # (仓内目录名, 本机安装名, 归属仓)
 # ⚠️ 最后一行是唯一需要改名的：Pro 仓里 core 同样叫 vedic-core，
