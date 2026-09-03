@@ -6,6 +6,45 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased] - 2026-09-04
+
+### Parivartana 三分类：Dainya 判据由双侧改为单侧（口径 bug 修复）
+
+- `yogas.md` / `vedic-core/SKILL.md` 的 Dainya 原写作「凶宫互溶：6/8/12 **之间**互换」——
+  这是**双侧**条件，只覆盖 3 组宫主对；实际按 Mantreswara《Phaladeepika》VI.32–34 应为
+  **单侧成立**（6/8/12 任一宫主与任何其它宫主互换、含彼此），30 组。
+  被压掉的 27 组此前无处归类：24 组落进无释义的 `Mixed` 档，3 组（3宫↔6/8/12）被误判成 Khala。
+- 三类经此修正构成**完备划分**：Maha 28 + Khala 8 + Dainya 30 = 66 = C(12,2)，
+  不存在第四档，故 `Mixed` 一并撤销。判定优先级 `Dainya > Khala > Maha`。
+- `engine.calc_parivartana` 判据 `x in DUS and y in DUS` → `or`，`Mixed` 分支删除。
+  全 66 对实测：Maha 28 / Khala 8 / Dainya 30。
+- 标签 `Dainya(凶宫互溶)` → `Dainya(凶宫参与)`——原名逐字表述的正是致错的双侧读法。
+  ⚠️ 下游按字符串匹配 `Dainya(凶宫互溶)` 的代码需同步。
+- 6/8/12 彼此互换那 3 组同时命中 VRY，禁止同时输出「困境捆绑」与「逆境崛起」两句互斥断语，
+  一律走 `p1_p12.md` P5「VRY 孤立性判定」裁决（与 Kalidasa《Uttara Kalamrita》IV.22 同义，
+  不另立口径）（`3316824`）。
+- 重建 `build/anchored/` 锚产物，`source_commit=33168242178c`（`c77f4bc`）。
+
+### 目录重构：真源 `antigravity/skills/` → `skills/`
+
+- **停止安装到 Antigravity 端点**：`INSTALL_ROOTS` 去掉 `~/.gemini/config/skills`（`724a1d7`）。
+  ⚠️ **停装 ≠ 不兼容**：Antigravity 及各类读 Claude Skill 格式的客户端，照样可从仓内
+  `skills/` 手工复制安装，见 README 安装节。这里停的只是「自动往那个本机路径铺一份」。
+- **真源目录改名并压平一层**：`antigravity/skills/vedic-*` → `skills/vedic-*`（`a911eb1`）。
+  这不只是改名，是修一个概念错误：**真源本来就不是「Antigravity 这个平台的发行面」，
+  它是所有发行面的来源**。旧结构把它塞进 `PLATFORMS` 列表里当成员之一，再靠
+  `if plat == CANON_PLATFORM: continue`（skill_sync）与 `PLATFORMS[1:]`（consistency_lint）
+  把自己跳过去——**位置耦合**：改列表忘了改切片，就会静默漏检一个平台。
+  现在 `CANON_DIR` 与 `PLATFORMS` 彻底分开，两处绕行代码随之删除。
+- 跟改：`skill_sync.py`、`build_anchored.py`、`scripts/check_skill_parity.py`、
+  三份 README、`codex/README.md`、`vedic-calculator/SKILL.md`（去掉指向已停装路径的示例）。
+- **锚产物内容零变化**：anchors 305 / sections 121 逐项相同、`file_hashes` 全同，
+  只有 `source_commit` 与 `generated_at` 变（`file` 字段本就是裸相对名，不含目录前缀）。
+  → **下游无需因本次改名重新 vendor**。
+- 历史条目中的 `antigravity/` 路径**不回改**——它们记录的是当时为真的事实。
+
+---
+
 ## [Unreleased] - 2026-09-03
 
 ### 安装方式变更：新增 `skill_sync.py`，一条命令装到本机
