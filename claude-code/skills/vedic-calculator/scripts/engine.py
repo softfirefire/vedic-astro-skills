@@ -451,8 +451,16 @@ def calc_mutual_drishti(graha_drishti):
 
 def calc_parivartana(house_lords, planets):
     """互溶对（parivartana，格局"互溶"唯一口径）：X宫主落Y宫 且 Y宫主落X宫（两宫主互换落座）。
-    分类：凶宫(6/8/12)互换=Dainya、含3宫=Khala、吉宫互换=Maha。返回 [{houses,lords,type},...]。"""
-    BENEFIC = {1, 2, 4, 5, 7, 9, 10, 11}
+
+    分类出处 Mantreswara《Phaladeepika》VI.32-34，28+8+30=66=C(12,2) 完备划分、无第四档：
+      Dainya = 6/8/12 任一宫主参与（**单侧即成立**，30 组）
+      Khala  = 3宫主 与吉宫主互换（8 组）
+      Maha   = 吉宫主之间互换（28 组）
+    优先级 Dainya > Khala > Maha，故 3宫↔6/8/12 归 Dainya 而非 Khala。
+    ⚠️ Dainya 曾被写成"6/8/12 彼此之间"的双侧条件，把 30 组压成 3 组，其余 27 组
+       落进一个无释义的 'Mixed' 档（24 组）并把 3 组误判成 Khala。单侧是正确口径，
+       改回后 'Mixed' 不再产生——规则正文见 vedic-core/resources/yogas.md 同名节。
+    返回 [{houses,lords,type},...]。"""
     DUS = {6, 8, 12}
     pairs = []
     for x in range(1, 13):
@@ -464,14 +472,12 @@ def calc_parivartana(house_lords, planets):
             hx = planets.get(lx, {}).get('house')
             hy = planets.get(ly, {}).get('house')
             if hx == y and hy == x:
-                if x in DUS and y in DUS:
-                    kind = 'Dainya(凶宫互溶)'
+                if x in DUS or y in DUS:
+                    kind = 'Dainya(凶宫参与)'
                 elif x == 3 or y == 3:
                     kind = 'Khala(3宫参与)'
-                elif x in BENEFIC and y in BENEFIC:
-                    kind = 'Maha(吉宫互溶)'
                 else:
-                    kind = 'Mixed'
+                    kind = 'Maha(吉宫互溶)'  # 余下必为吉宫对：三类完备，无 fallback
                 pairs.append({'houses': [x, y], 'lords': [lx, ly], 'type': kind})
     return pairs
 
