@@ -6,6 +6,36 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased] - 2026-09-03
+
+### 安装方式变更：新增 `skill_sync.py`，一条命令装到本机
+
+- 新增仓根 `skill_sync.py`（Python，跨平台）。**克隆本仓后直接运行即可把 9 个 skill 装到
+  `~/.claude/skills/` 与 `~/.gemini/config/skills/`**，此前 Windows 之外只能手工复制：
+
+  ```bash
+  python skill_sync.py all          # 仓内三平台拉平 + 装到本机
+  python skill_sync.py all --dry-run # 只看差异，不写文件
+  ```
+
+  子命令 `platforms`（仓内 antigravity → claude-code + codex）/ `install`（仓 → 本机）/ `all`。
+  脚本**不执行任何 git 操作**；`install` 只覆盖新增、不删除，本机多出的文件以 `[ORPHAN]` 报出，
+  确认后加 `--prune` 才清理。
+- 同步范围新增 `tests/`。`vedic-prashna/tests/test_prashna_isolation.py`（Prashna 沙箱四条隔离
+  回归断言）此前从未随仓分发，现已入仓，克隆后可直接运行。该文件不再硬编码路径，仓布局与安装
+  布局下都能跑，并支持 `VEDIC_SKILLS_ROOT` 覆盖。
+- `build_anchored.py` 移入仓根并改为从自身位置推导路径，锚产物可独立重建。
+- 移除 `sync_all.ps1`（Windows-only，方向为「本地目录 → 仓」，且会自动 commit + push）。
+  改由上述 `skill_sync.py` 承担，方向反转为「仓 → 本机」，提交与推送一律手工。
+
+### Parivartana 扫描口径修正
+
+- `vedic-core/resources/` Parivartana 扫描改读 calculator 的互溶对照表，分类与 `yogas.md`
+  对齐，不再由模型自行推导宫主互换（`6d9054d`）。
+- 重建 `build/anchored/` 锚产物，`source_commit=6d9054d29335`（`4884937`）。
+
+---
+
 ## [Unreleased] - 2026-08-28
 
 ### 三级运（Pratyantardasha）纪律补齐
