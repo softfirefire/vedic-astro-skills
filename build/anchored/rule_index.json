@@ -1,11 +1,11 @@
 {
- "source_commit": "e5083fe84890",
- "generated_at": "2026-08-27T16:49:56Z",
+ "source_commit": "6d9054d29335",
+ "generated_at": "2026-09-03T11:31:41Z",
  "repo": "vedic-astrology-skills",
  "anchor_count": 305,
  "section_count": 121,
  "file_hashes": {
-  "SKILL.md": "055f7feec1b9",
+  "SKILL.md": "18d8ebff7386",
   "resources/p1_p12.md": "602156a34eb4",
   "resources/yogas.md": "c1906d0a69ba",
   "resources/house_framework.md": "0db55f1c2f7a",
@@ -622,11 +622,11 @@
    "text": "### Step 3后置：Parivartana（互溶）扫描"
   },
   {
-   "id": "A-SK-6a94aafb",
+   "id": "A-SK-c83e62a1",
    "file": "SKILL.md",
    "level": "L2",
-   "title": "扫描方法：",
-   "text": "```\n扫描方法：\n  逐对检查所有宫主：如果A星管X宫落在Y宫，B星管Y宫落在X宫\n  → A和B形成Parivartana（互溶），X宫和Y宫形成双向通道\n\n对每对互溶：\n  1. 标注互溶类型：\n     - 吉吉互溶（两个吉宫主交换）→ 双赢合作\n     - 吉凶互溶（吉宫主和凶宫主交换）→ 捆绑，福祸相依\n     - 凶凶互溶（两个凶宫主交换）→ 需要看具体宫位\n\n  2. 分析捆绑效应：\n     → 两个宫位的事务被强制捆绑\n     → 例：1-2宫互溶 = 自我认同和财富紧密关联\n     → 人话翻译嵌入对应宫位的诊断中\n\n  3. 输出（追加到p4b_houses.md末尾）：\n     ## 宫位联动：互溶关系\n     [X]宫 ↔ [Y]宫 互溶（[A星] ↔ [B星]）\n     → [效应分析，用人话]\n\n如果全盘无互溶 → 标注\"本盘无Parivartana互溶\"即可\n```"
+   "title": "⚠️ 互溶对一律读 structured_data「格局关系类 · 互视 / 互溶」段的「互溶对」表",
+   "text": "```\n⚠️ 互溶对一律读 structured_data「格局关系类 · 互视 / 互溶」段的「互溶对」表\n   （calc 已判、含 Maha/Khala/Dainya 分类）——❌禁逐对手推宫主互换。\n   与 yogas.md「Parivartana Yoga（互溶格局）」节同一定义源，口径以 yogas.md 为准。\n\n对每对互溶：\n  1. 引用calc已给的互溶类型（唯一分类口径见yogas.md）：\n     - Maha Parivartana（吉宫互溶：1/2/4/5/7/9/10/11 之间互换）→ 双赢，两领域互相成就\n     - Khala Parivartana（3宫主参与的互溶）→ 努力后有收获，过程波折\n     - Dainya Parivartana（凶宫互溶：6/8/12 之间互换）→ 困境捆绑，福祸相依\n\n  2. 分析捆绑效应：\n     → 两个宫位的事务被强制捆绑\n     → 例：1-2宫互溶 = 自我认同和财富紧密关联\n     → 人话翻译嵌入对应宫位的诊断中\n\n  3. 输出（追加到p4b_houses.md末尾）：\n     ## 宫位联动：互溶关系\n     [X]宫 ↔ [Y]宫 互溶（[A星] ↔ [B星]，[Maha/Khala/Dainya]）\n     → [效应分析，用人话]\n\n「互溶对」表为空 → 标注\"本盘无Parivartana互溶\"即可；\n❌ 不得因表为空而改用手推补齐\n```"
   },
   {
    "id": "A-SK-8fd404b4",
@@ -2419,8 +2419,8 @@
    "anchor": "A-SK-76b7cef0",
    "file": "SKILL.md",
    "title": "Step 3后置：Parivartana（互溶）扫描",
-   "section_hash": "45d9a89fd375",
-   "n_lines": 28
+   "section_hash": "f66cda07b45e",
+   "n_lines": 29
   },
   {
    "anchor": "A-SK-8fd404b4",
