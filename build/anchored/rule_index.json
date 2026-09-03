@@ -1,13 +1,13 @@
 {
- "source_commit": "6d9054d29335",
- "generated_at": "2026-09-03T11:31:41Z",
+ "source_commit": "33168242178c",
+ "generated_at": "2026-09-03T19:18:28Z",
  "repo": "vedic-astrology-skills",
  "anchor_count": 305,
  "section_count": 121,
  "file_hashes": {
-  "SKILL.md": "18d8ebff7386",
+  "SKILL.md": "6768d467638c",
   "resources/p1_p12.md": "602156a34eb4",
-  "resources/yogas.md": "c1906d0a69ba",
+  "resources/yogas.md": "37ca883b5942",
   "resources/house_framework.md": "0db55f1c2f7a",
   "resources/qa_rules.md": "789d2a3b192a"
  },
@@ -626,7 +626,7 @@
    "file": "SKILL.md",
    "level": "L2",
    "title": "⚠️ 互溶对一律读 structured_data「格局关系类 · 互视 / 互溶」段的「互溶对」表",
-   "text": "```\n⚠️ 互溶对一律读 structured_data「格局关系类 · 互视 / 互溶」段的「互溶对」表\n   （calc 已判、含 Maha/Khala/Dainya 分类）——❌禁逐对手推宫主互换。\n   与 yogas.md「Parivartana Yoga（互溶格局）」节同一定义源，口径以 yogas.md 为准。\n\n对每对互溶：\n  1. 引用calc已给的互溶类型（唯一分类口径见yogas.md）：\n     - Maha Parivartana（吉宫互溶：1/2/4/5/7/9/10/11 之间互换）→ 双赢，两领域互相成就\n     - Khala Parivartana（3宫主参与的互溶）→ 努力后有收获，过程波折\n     - Dainya Parivartana（凶宫互溶：6/8/12 之间互换）→ 困境捆绑，福祸相依\n\n  2. 分析捆绑效应：\n     → 两个宫位的事务被强制捆绑\n     → 例：1-2宫互溶 = 自我认同和财富紧密关联\n     → 人话翻译嵌入对应宫位的诊断中\n\n  3. 输出（追加到p4b_houses.md末尾）：\n     ## 宫位联动：互溶关系\n     [X]宫 ↔ [Y]宫 互溶（[A星] ↔ [B星]，[Maha/Khala/Dainya]）\n     → [效应分析，用人话]\n\n「互溶对」表为空 → 标注\"本盘无Parivartana互溶\"即可；\n❌ 不得因表为空而改用手推补齐\n```"
+   "text": "```\n⚠️ 互溶对一律读 structured_data「格局关系类 · 互视 / 互溶」段的「互溶对」表\n   （calc 已判、含 Maha/Khala/Dainya 分类）——❌禁逐对手推宫主互换。\n   与 yogas.md「Parivartana Yoga（互溶格局）」节同一定义源，口径以 yogas.md 为准。\n\n对每对互溶：\n  1. 引用calc已给的互溶类型（唯一分类口径见yogas.md）：\n     - Maha Parivartana（吉宫互溶：1/2/4/5/7/9/10/11 之间互换，28组）→ 双赢，两领域互相成就\n     - Khala Parivartana（3宫主 与上述吉宫主互换，8组）→ 努力后有收获，过程波折\n     - Dainya Parivartana（6/8/12 任一宫主 与任何其它宫主互换、含彼此，30组）→ 困境捆绑，福祸相依\n     判定优先级 Dainya > Khala > Maha，故 3宫主↔6/8/12宫主 归 Dainya、不归 Khala。\n     ⚠️ Dainya 是**单侧成立**（只需一方是 6/8/12 宫主），❌禁按\"6/8/12 彼此之间\"的双侧读\n        （双侧读把 30 组压成 3 组，其余 27 组无处归类）。\n     ⚠️ 6/8/12 彼此互换那 3 组同时命中 VRY，❌禁同时输出\"困境捆绑\"与\"逆境崛起\"，\n        一律走 p1_p12.md P5「VRY孤立性判定」裁决——详见 yogas.md 同名节。\n\n  2. 分析捆绑效应：\n     → 两个宫位的事务被强制捆绑\n     → 例：1-2宫互溶 = 自我认同和财富紧密关联\n     → 人话翻译嵌入对应宫位的诊断中\n\n  3. 输出（追加到p4b_houses.md末尾）：\n     ## 宫位联动：互溶关系\n     [X]宫 ↔ [Y]宫 互溶（[A星] ↔ [B星]，[Maha/Khala/Dainya]）\n     → [效应分析，用人话]\n\n「互溶对」表为空 → 标注\"本盘无Parivartana互溶\"即可；\n❌ 不得因表为空而改用手推补齐\n```"
   },
   {
    "id": "A-SK-8fd404b4",
@@ -1557,7 +1557,7 @@
    "file": "resources/yogas.md",
    "level": "L2",
    "title": "条件：两颗宫主互换落座——A星管X宫落在Y宫，B星管Y宫落在X宫",
-   "text": "```\n条件：两颗宫主互换落座——A星管X宫落在Y宫，B星管Y宫落在X宫\n含义：X宫和Y宫的事务被强制捆绑，形成双向通道\n分类（按参与宫位定吉凶）：\n  - Maha Parivartana（吉宫互溶：1/2/4/5/7/9/10/11 之间互换）→ 双赢，两领域互相成就\n  - Khala Parivartana（3宫主参与的互溶）→ 努力后有收获，过程波折\n  - Dainya Parivartana（凶宫互溶：6/8/12 之间互换）→ 困境捆绑，福祸相依\n评估：\n  参与的两颗星的 Shadbala 和尊贵度决定捆绑质量\n  ⚠️ 互溶本身可构成其他格局，扫格局时必须并入对应判定、不能只当独立条目漏掉：\n     互溶双方是 角宫主+三角宫主 → 等同 Raja Yoga 通道；\n     是 2/11 宫主 → 等同 Dhana Yoga 通道；\n     是 9/10 宫主 → 等同 Dharma-Karma 通道。\n```"
+   "text": "```\n条件：两颗宫主互换落座——A星管X宫落在Y宫，B星管Y宫落在X宫\n含义：X宫和Y宫的事务被强制捆绑，形成双向通道\n分类（按参与宫位定吉凶；出处 Mantreswara《Phaladeepika》VI.32–34。28+8+30=66=C(12,2)，三类穷尽全部宫主对，无第四档）：\n  - Maha Parivartana（吉宫互溶：1/2/4/5/7/9/10/11 之间互换，28 组）→ 双赢，两领域互相成就\n  - Khala Parivartana（3宫主 与上述吉宫主互换，8 组）→ 努力后有收获，过程波折\n  - Dainya Parivartana（6/8/12 任一宫主 与任何其它宫主互换、含彼此，30 组）→ 困境捆绑，福祸相依\n  判定优先级：Dainya > Khala > Maha（凶宫参与优先）——故 3宫主↔6/8/12宫主 归 Dainya，不归 Khala\n  ⚠️ Dainya 是**单侧成立**（只需一方是 6/8/12 宫主），不是\"6/8/12 彼此之间\"的双侧条件。\n     按双侧读会把 30 组压成 3 组，其余 27 组无处归类——❌禁止按双侧读。\n评估：\n  参与的两颗星的 Shadbala 和尊贵度决定捆绑质量\n  ⚠️ 6/8/12 宫主彼此互换的那 3 组同时命中 VRY 落宫式判定（两边都\"落入其他凶宫\"，\n     即本文件 VRY 条目所称\"最强特例\"）。此时❌禁止同时输出\"困境捆绑\"与\"逆境崛起\"两句互斥断语，\n     一律走 p1_p12.md P5「VRY孤立性判定」裁决：孤立（未被吉宫主合相污染）→ 按 VRY 读；\n     被稀释或失效 → 回落 Dainya 读。\n     （Kalidasa《Uttara Kalamrita》IV.22「6/8/12宫主互换若不与其它宫主关联则吉」\n       与 P5 孤立性判定同义，故此处不另立口径。）\n  ⚠️ 互溶本身可构成其他格局，扫格局时必须并入对应判定、不能只当独立条目漏掉：\n     互溶双方是 角宫主+三角宫主 → 等同 Raja Yoga 通道；\n     是 2/11 宫主 → 等同 Dhana Yoga 通道；\n     是 9/10 宫主 → 等同 Dharma-Karma 通道。\n```"
   },
   {
    "id": "A-YG-2e04b7f3",
@@ -2419,8 +2419,8 @@
    "anchor": "A-SK-76b7cef0",
    "file": "SKILL.md",
    "title": "Step 3后置：Parivartana（互溶）扫描",
-   "section_hash": "f66cda07b45e",
-   "n_lines": 29
+   "section_hash": "c20008f5b9eb",
+   "n_lines": 34
   },
   {
    "anchor": "A-SK-8fd404b4",
@@ -2769,8 +2769,8 @@
    "anchor": "A-YG-70ca0a54",
    "file": "resources/yogas.md",
    "title": "Parivartana Yoga（互溶格局）",
-   "section_hash": "bd1ea1f5d261",
-   "n_lines": 18
+   "section_hash": "404ba8965e36",
+   "n_lines": 27
   },
   {
    "anchor": "A-YG-2e04b7f3",
