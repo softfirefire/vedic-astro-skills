@@ -307,6 +307,20 @@ Clone the repository, then install all eight skills:
 git clone https://github.com/CNWU16/vedic-astro-skills.git
 ```
 
+### One command (recommended)
+
+```bash
+python vedic-astro-skills/skill_sync.py install
+```
+
+Installs to `~/.claude/skills/` (Claude Code) and `~/.gemini/config/skills/` (Antigravity).
+Add `--dry-run` to preview without writing. The script performs **no git operations**, and
+only adds or overwrites — never deletes. Files present locally but absent from the repo are
+listed as `[ORPHAN]`; add `--prune` to remove them once you have reviewed the list.
+
+Codex users: use the manual copy in the next section. `~/.codex/skills/` is outside the
+automatic install scope, and Codex additionally needs `codex-patch/`.
+
 ### Codex
 
 ```bash

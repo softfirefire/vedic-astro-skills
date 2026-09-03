@@ -295,6 +295,19 @@ Prashna 只回答一个可观察结果明确的问题，使用问题正式形成
 git clone https://github.com/CNWU16/vedic-astro-skills.git
 ```
 
+### 一条命令装好（推荐）
+
+```bash
+python vedic-astro-skills/skill_sync.py install
+```
+
+自动装到 `~/.claude/skills/`（Claude Code）与 `~/.gemini/config/skills/`（Antigravity）。
+加 `--dry-run` 只看差异、不写文件。脚本**不执行任何 git 操作**，且只覆盖与新增、不删除；
+本机多出的文件以 `[ORPHAN]` 列出，确认后加 `--prune` 才清理。
+
+Codex 请用下一节的手工复制——`~/.codex/skills/` 不在自动安装范围，且 Codex 还需配套
+安装 `codex-patch/`。
+
 ### Codex
 
 ```bash

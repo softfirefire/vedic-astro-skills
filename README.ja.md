@@ -297,6 +297,20 @@ v6.1 で記録された回帰サンプル：
 git clone https://github.com/CNWU16/vedic-astro-skills.git
 ```
 
+### コマンド一つでインストール（推奨）
+
+```bash
+python vedic-astro-skills/skill_sync.py install
+```
+
+`~/.claude/skills/`（Claude Code）と `~/.gemini/config/skills/`（Antigravity）へ自動で
+インストールします。`--dry-run` を付けると差分の確認のみで書き込みません。本スクリプトは
+**git 操作を一切行わず**、上書きと追加のみで削除はしません。リポジトリに無いローカル
+ファイルは `[ORPHAN]` として一覧表示され、確認のうえ `--prune` を付けた場合のみ削除します。
+
+Codex は次節の手動コピーをご利用ください。`~/.codex/skills/` は自動インストールの対象外で、
+別途 `codex-patch/` の導入も必要です。
+
 ### Codex
 
 ```bash

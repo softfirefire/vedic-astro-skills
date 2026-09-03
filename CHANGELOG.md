@@ -27,9 +27,15 @@ All notable changes to this project will be documented in this file.
 
 ### 目录重构：真源 `antigravity/skills/` → `skills/`
 
-- **停止安装到 Antigravity 端点**：`INSTALL_ROOTS` 去掉 `~/.gemini/config/skills`（`724a1d7`）。
-  ⚠️ **停装 ≠ 不兼容**：Antigravity 及各类读 Claude Skill 格式的客户端，照样可从仓内
-  `skills/` 手工复制安装，见 README 安装节。这里停的只是「自动往那个本机路径铺一份」。
+- **Antigravity 端点：身份变了，不是没了**。`INSTALL_ROOTS` 一度去掉
+  `~/.gemini/config/skills`（`724a1d7`），当日恢复——该端仍在使用。
+  旧世界里这个目录**身兼真源与安装点两职**，角色一混，「同步」的方向就取决于谁记得
+  当时是哪个身份；现在它与 `~/.claude/skills` 平级，都是从仓里铺下去的副本，**只收不发**。
+- **README 补自动安装节（三语）**：`skill_sync.py` 是 09-03 新增的，但**只写进了 CHANGELOG、
+  从未写进 README**——克隆本仓的人看不到有这个工具，只能照着手工 `cp`。现补
+  `### 一条命令装好（推荐）`：`python skill_sync.py install` 装到 Claude Code 与
+  Antigravity 两处，`--dry-run` 预览，只增不删、多余文件报 `[ORPHAN]`。
+  Codex 仍走手工复制（`~/.codex/skills/` 不在自动范围，且需配套 `codex-patch/`）。
 - **真源目录改名并压平一层**：`antigravity/skills/vedic-*` → `skills/vedic-*`（`a911eb1`）。
   这不只是改名，是修一个概念错误：**真源本来就不是「Antigravity 这个平台的发行面」，
   它是所有发行面的来源**。旧结构把它塞进 `PLATFORMS` 列表里当成员之一，再靠

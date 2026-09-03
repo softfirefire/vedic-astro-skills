@@ -65,12 +65,17 @@ SKILLS = [
     ('vedic-core',       'vedic-core-pro',   'pro'),
 ]
 
-# 2026-09-04：停装 Antigravity（~/.gemini/config/skills）——创始人已不再使用该端，
-# 本机旧副本同日手工删除，不留僵尸（僵尸副本会停在停装当天的口径，且外观与在用的一样）。
-# ⚠️ 停装 ≠ 不兼容：Antigravity、以及各家读 Claude Skill 格式的客户端，照样可以从仓内
-#    skills/ 手工复制安装，见 README 安装节。这里只是不再自动往那个本机路径铺一份。
+# 本机安装点。⚠️ 这里全是**消费端**，一个都不是源——这正是本次改造的要点。
+# 旧世界里 ~/.gemini/config/skills 身兼两职（既当真源、又当安装点），角色一混，
+# 「同步」的方向就取决于谁记得当时是哪个身份，于是同一个脚本既可能分发最新、
+# 也可能用旧覆盖新。现在真源只有 <repo>/skills/ 一处，下面这些只收不发。
+#
+# 2026-09-04 当日反复：先去掉 Antigravity（以为已弃用），当日又加回——创始人仍偶尔开
+# 该端，且那边另有 92 个非 vedic 的 skill 在用，目录并未废弃。**加回的是安装端点身份，
+# 不是真源身份**：它现在和 ~/.claude/skills 平级，都是从仓里铺下去的副本。
 INSTALL_ROOTS = [
     ('claude', Path.home() / '.claude' / 'skills'),
+    ('antigravity', Path.home() / '.gemini' / 'config' / 'skills'),
 ]
 
 
