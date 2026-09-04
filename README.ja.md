@@ -248,7 +248,7 @@ KN Rao／Bharatiya Vidya Bhavan の実践との互換性を確認しています
 | Vimshottari Dasha | PyJHora の MD/AD/PD | `[start,end)` の連続区間 |
 | Shadbala | PyJHora + 9項目の修正 | Ishta/Kashta Phala を含む |
 | 分割図 | PyJHora ネイティブ | D1～D60 の15図、主要図は安定性を別途監査 |
-| Dignity | dashaflow + 高揚・自室・減衰の優先判定 | Compound Relationship を出力 |
+| Dignity | エンジン内蔵 + 高揚・自室・減衰の優先判定 | Compound Relationship を出力 |
 | Chara Karaka | 7K 主表 + 8K 参考 | 7K を KN Rao の主要基準として使用 |
 | エラー処理 | fail-fast | 依存不足や重大エラー時に既知の誤った代替計算へ戻らない |
 
@@ -354,12 +354,12 @@ python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex または Claude Code では、インストール先にある同名スクリプトへパスを変更できます。
-`setup_env.py` は互換 Python を選択し、分離環境を作成し、10個の依存パッケージを正しい順序で
+`setup_env.py` は互換 Python を選択し、分離環境を作成し、依存パッケージを正しい順序で
 導入し、ephemeris ファイルを補い、最小 SAV 計算を検証します。
 
-> `pip install -r requirements.txt` を直接実行しないでください。`dashaflow` は停止済みの
-> `pyswisseph` を依存として宣言していますが、この Suite は `pysweph` を使います。
-> 自動スクリプトが導入順序と `--no-deps` で競合を処理します。
+> `pip install -r requirements.txt` を直接実行するより `setup_env.py` を推奨します。
+> ephemeris のダウンロード、導入順序、導入後の SAV 自己検証はすべてスクリプト側にあります。
+> 手動導入では ephemeris を取りこぼし、低精度モードへ静かに退避しやすくなります。
 
 ## ⚡ クイックスタート
 

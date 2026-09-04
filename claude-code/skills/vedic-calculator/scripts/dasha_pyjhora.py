@@ -31,22 +31,24 @@ _DASHA_ORDER = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Satu
 def _setup_jhora():
     """Apply the same monkey-patches as ashtakavarga_pyjhora.py"""
     # Patch swe.calc_ut for pysweph 2.10+ compatibility
+    # 哨兵必须与其余 4 个包装层同名(_patched)：曾用 _dasha_patched 导致两族互不识别，
+    # 每张全盘交替调用后叠加 2 层，约 490 张后 RecursionError（常驻进程可触发）。
     orig_calc = swe.calc_ut
-    if not getattr(orig_calc, '_dasha_patched', False):
+    if not getattr(orig_calc, '_patched', False):
         def patched_calc(jd, planet, flags=0):
             r = orig_calc(jd, planet, flags=flags)
             return r[0], r[1] if len(r) > 1 else 0
-        patched_calc._dasha_patched = True
+        patched_calc._patched = True
         swe.calc_ut = patched_calc
 
     # Patch swe.houses_ex
     if hasattr(swe, 'houses_ex'):
         orig_he = swe.houses_ex
-        if not getattr(orig_he, '_dasha_patched', False):
+        if not getattr(orig_he, '_patched', False):
             def patched_he(*a, **kw):
                 r = orig_he(*a, **kw)
                 return (r[0], r[1]) if len(r) == 3 else r
-            patched_he._dasha_patched = True
+            patched_he._patched = True
             swe.houses_ex = patched_he
 
 
@@ -99,6 +101,12 @@ def calculate_dasha_fixed(
     place = Place('birth_place', lat, lon, tz_offset)
     local_hour = hour + minute / 60.0
     jd_local = swe.julday(year, month, day, local_hour)
+
+    # PyJHora 的 vimsottari.year_duration 是模块全局，初值为平均恒星年(const.sidereal_year)，
+    # 只有 get_vimsottari_dhasa_bhukthi(L2) 才把它更新为真恒星年；而本函数先调 L1 后调 L2，
+    # 于是进程内首张盘的 L1 用平均年、后续盘用上一张残留的真年 → 末 MD 的 end/end_time 首调
+    # 漂移约 5 小时（skill CLI 每盘都是首调）。显式先对齐，保证 L1/L2 同一年长。
+    vimsottari.year_duration = drik.dhasa_year_duration(jd=jd_local, place=place)
 
     # ── 1. Get Mahadasha start dates ──
     md_dict = vimsottari.vimsottari_mahadasa(jd_local, place)

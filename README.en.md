@@ -254,7 +254,7 @@ experimental candidates until their published-example and boundary suites are co
 | Vimshottari Dasha | Native PyJHora MD/AD/PD | Continuous `[start,end)` intervals |
 | Shadbala | PyJHora plus nine targeted corrections | Includes Ishta/Kashta Phala |
 | Divisional charts | Native PyJHora | 15 charts from D1 to D60; key charts receive stability audits |
-| Dignity | dashaflow plus exaltation/own/debilitation precedence | Compound Relationship output |
+| Dignity | Built into the engine, with exaltation/own/debilitation precedence | Compound Relationship output |
 | Chara Karaka | 7K primary plus 8K reference | 7K is the primary KN Rao alignment |
 | Error handling | fail-fast | Missing dependencies and critical failures stop instead of using known-bad fallbacks |
 
@@ -364,12 +364,12 @@ python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex and Claude Code users may substitute the same script path under their installed skill. The
-setup script selects a compatible Python, creates an isolated environment, installs ten packages
+setup script selects a compatible Python, creates an isolated environment, installs the packages
 in the required order, restores ephemeris files, and validates a minimal SAV calculation.
 
-> Do not run `pip install -r requirements.txt` directly. `dashaflow` declares the retired
-> `pyswisseph` package while this suite uses `pysweph`; the setup script handles the conflict with
-> ordered installation and `--no-deps`.
+> Prefer `setup_env.py` over a bare `pip install -r requirements.txt`: ephemeris download,
+> install ordering, and the post-install SAV self-check all live in the script. A manual install
+> easily misses the ephemeris files and silently falls back to a lower-precision mode.
 
 ## ⚡ Quick start
 

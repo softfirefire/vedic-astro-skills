@@ -90,8 +90,8 @@ def _exact_planets(jd: float, lagna_sign_idx: int) -> dict:
         record["nakshatra"] = engine.get_nakshatra(record["longitude"])
         planets[name] = record
 
-    flags = engine.swe.FLG_SIDEREAL | engine.swe.FLG_SPEED
-    node_result = engine.swe.calc_ut(jd, engine.swe.MEAN_NODE, flags)[0]
+    # 与 engine 同一套 flags：上面的七星走 engine.calc_planet，此处不能另用一套基准
+    node_result = engine.swe.calc_ut(jd, engine.swe.MEAN_NODE, engine.PLANET_FLAGS)[0]
     rahu_longitude = node_result[0] % 360.0
     for name, longitude, speed in (
         ("Rahu", rahu_longitude, node_result[3]),

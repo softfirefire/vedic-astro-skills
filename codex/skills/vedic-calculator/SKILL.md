@@ -14,15 +14,15 @@ description: "Calculate a complete Vedic/Jyotish natal chart directly from birth
 - If the user changes language mid-run, preserve the existing data and artifact lineage; switch client-facing language from that point onward unless the user explicitly asks to regenerate earlier artifacts.
 - When `client_language` is Japanese, read `resources/ja-calculator.md` completely before the first Japanese client-facing message. Apply it only as a terminology, register, intake, and rendering layer; it never changes calculations, schemas, evidence, phases, or output requirements.
 
-> 基于pysweph天文引擎 + dashaflow算法模块，直接从出生时间计算完整星盘数据。
+> 基于pysweph天文引擎 + PyJHora精确算法，直接从出生时间计算完整星盘数据。
 > 输出格式完全兼容vedic-reader的structured_data.md，可直接交给vedic-core分析。
 
 ## 前置条件
 
 - Python 3.8 ~ 3.13（pysweph 为 C 扩展，**3.14 暂不支持**）
-- 依赖: pysweph, dashaflow, PyJHora==4.8.6, pytz
+- 依赖: pysweph, PyJHora==4.8.6, pytz
 
-> ⚠️ **不要直接 `pip install -r requirements.txt`！** dashaflow 声明依赖已停更的 pyswisseph，会导致冲突。
+> ⚠️ **不要直接 `pip install -r requirements.txt`！** PyJHora 未声明其运行时依赖，且 pip 包缺少 .se1 星历文件。
 > 请使用 `setup_env.py` 自动安装（见下方）。
 
 ### 环境自动检测
@@ -57,7 +57,7 @@ description: "Calculate a complete Vedic/Jyotish natal chart directly from birth
 
 该脚本会自动检查：
   ✅ venv 位置和 Python 版本
-  ✅ 4个核心依赖（pysweph/dashaflow/PyJHora/pytz）
+  ✅ 3个核心依赖（pysweph/PyJHora/pytz）
   ✅ swisseph 空壳检测
   ✅ 星历表文件
   ✅ 最小计算测试（SAV=337）
@@ -424,7 +424,7 @@ chart = {
 - 分盘: **PyJHora 原生** (divisional_pyjhora.py) — 15张 D1~D60
 - 分盘稳定性: 在调用方传入的`uncertainty_minutes`内逐分钟重算D1/D9/D10/D4/D5
   Lagna；数学正确性与输入稳定性分别报告
-- Dignity: dashaflow + 旺/入庙/陷前置判断
+- Dignity: 自建（旺/入庙/陷前置判断）；燃烧 orb / 方位强宫两表内联于 engine.py
 - Chara Karakas: 7K（KN Rao）+ 8K参考
 - 容错策略: **fail-fast**（缺依赖直接报错，不给错误结果）
 

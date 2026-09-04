@@ -10,6 +10,9 @@ BAV_ROW_SUMS = {'Sun':48,'Moon':49,'Mars':39,'Mercury':54,'Jupiter':56,'Venus':5
 SIGN_ABBR = ['Ar','Ta','Ge','Cn','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
 SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
          'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
+# 27 宿主星（Vimsottari 序循环 3 遍），供校验区独立重算 Nakshatra 用
+NAK_LORDS = ['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'] * 3
+P9 = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu']
 
 def format_structured_data(chart, transit_data, meta, user_info):
     """
@@ -535,22 +538,89 @@ def format_structured_data(chart, transit_data, meta, user_info):
                 dasha_continuous &= pds[0]['start_time'] == ad['start_time']
                 dasha_continuous &= pds[-1]['end_time'] == ad['end_time']
     dasha_ok = '✅' if (md_count, ad_count, pd_count) == (9, 81, 729) and dasha_continuous else '❌'
-    
+
+    # ── 以下 8 项此前无条件打 ✅（等于没有校验，报告却写成"已验"）。
+    # 改为从 longitude 独立重算后比对 chart 内已存值，走与 engine 不同的推导路径。
+    P = chart.get('planets', {})
+    # 注：真缺星时上游各表格已 KeyError（fail-fast），走不到这里；本项是结构冗余检查，
+    # 实际防的是 chart 被下游改写后再送进来的情形。
+    body_count = len([p for p in P9 if p in P]) + (1 if chart.get('lagna') else 0)
+    body_ok = '✅' if body_count == 10 else '❌'
+
+    lons = [round(P[p]['longitude'], 6) for p in P9 if p in P]
+    uniq_ok = '✅' if len(lons) == len(set(lons)) else '❌'
+
+    retro_ok = '✅' if (
+        all(isinstance(P.get(p, {}).get('retrograde'), bool) for p in P9)
+        and P.get('Rahu', {}).get('retrograde') and P.get('Ketu', {}).get('retrograde')
+    ) else '❌'
+
+    # 燃烧：入列者必须确实落在 Sun 的最宽 orb(17°, Mars)内，且 Sun 自身不得入列
+    sun_lon = P.get('Sun', {}).get('longitude')
+    comb_ok = '❌' if sun_lon is None else '✅'
+    if sun_lon is not None:
+        for p in comb_list:
+            if p == 'Sun' or p not in P:
+                comb_ok = '❌'; break
+            _d = abs(P[p]['longitude'] - sun_lon)
+            if _d > 180: _d = 360 - _d
+            if _d > 17:
+                comb_ok = '❌'; break
+
+    ay = chart.get('ayanamsa')
+    aya_ok = '✅' if isinstance(ay, (int, float)) and 22.0 <= ay <= 25.0 else '❌'
+
+    # Nakshatra ↔ 度数：由经度独立重算 pada 与宿主，比对 chart 内已存值
+    nak_ok = '✅'
+    for p in P9:
+        if p not in P:
+            nak_ok = '❌'; break
+        nk = P[p].get('nakshatra') or {}
+        _lon = P[p]['longitude']
+        if (nk.get('pada') != int((_lon % (360/27)) / (360/108)) + 1
+                or nk.get('lord') != NAK_LORDS[int(_lon / (360/27))]):
+            nak_ok = '❌'; break
+
+    # Chara Karaka：独立按星座内度数降序重排，比对 calc 给出的 DK(7K)
+    try:
+        _k7 = sorted(['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'],
+                     key=lambda n: P[n]['degree'], reverse=True)
+        karaka_ok = '✅' if chart.get('karakas', {}).get('dk_7k') == _k7[6] else '❌'
+    except (KeyError, TypeError):
+        karaka_ok = '❌'
+
+    # D9 交叉：engine 走"元素起点表 + navamsa 序号"，此处走"9×星座序号"等价式
+    d9 = chart.get('d9', {})
+    d9_ok = '✅'
+    for p in P9:
+        if p not in P or p not in d9:
+            d9_ok = '❌'; break
+        _lon = P[p]['longitude']
+        if d9[p][1] != (9 * int(_lon / 30) + int((_lon % 30) / (30/9))) % 12:
+            d9_ok = '❌'; break
+
+    # Ra-Ke 在 D9：经度恒差 180° ⇒ navamsha 恒差 6 座
+    try:
+        rake_d9_ok = '✅' if (d9['Ketu'][1] - d9['Rahu'][1]) % 12 == 6 else '❌'
+    except (KeyError, TypeError, IndexError):
+        rake_d9_ok = '❌'
+
     lines.append("```")
     lines.append(f" 1. SAV={sav_total}          {sav_ok}")
     lines.append(f" 2. BAV行常量        {bav_ok} {bav_detail}")
-    lines.append(f" 3. 行星完整性(10)   ✅")
-    lines.append(f" 4. 度数唯一性        ✅")
+    lines.append(f" 3. 行星完整性(10)   {body_ok} {body_count}/10")
+    lines.append(f" 4. 度数唯一性        {uniq_ok}")
     lines.append(f" 5. Ra-Ke差180°      {ra_ke_ok}")
-    lines.append(f" 6. 逆行标记完整      ✅")
-    lines.append(f" 6b. 燃烧检测        ✅ [{comb_str}]")
-    lines.append(f" 7. Ayanamsa一致     ✅ True Chitra")
+    lines.append(f" 6. 逆行标记完整      {retro_ok}")
+    lines.append(f" 6b. 燃烧检测        {comb_ok} [{comb_str}]")
+    lines.append(f" 7. Ayanamsa一致     {aya_ok} True Chitra {ay:.4f}°" if isinstance(ay, (int, float))
+                 else f" 7. Ayanamsa一致     {aya_ok} True Chitra")
     lines.append(f" 7c. 盈月/亏月       {phase_str}")
-    lines.append(f" 8. Nakshatra↔度数   ✅")
-    lines.append(f" 9. Chara Karaka排序 ✅")
+    lines.append(f" 8. Nakshatra↔度数   {nak_ok}")
+    lines.append(f" 9. Chara Karaka排序 {karaka_ok}")
     lines.append(f"10. Vimsottari层级   {dasha_ok} MD={md_count}/AD={ad_count}/PD={pd_count} 连续={dasha_continuous}")
-    lines.append(f"11. D9公式交叉       ✅（直接计算，无需交叉验证）")
-    lines.append(f"12. Ra-Ke分盘校验    ✅（直接计算）")
+    lines.append(f"11. D9公式交叉       {d9_ok}（经度独立重算比对）")
+    lines.append(f"12. Ra-Ke分盘校验    {rake_d9_ok}（D9 恒差6座）")
     lines.append("```\n")
     
     # === 过运 ===

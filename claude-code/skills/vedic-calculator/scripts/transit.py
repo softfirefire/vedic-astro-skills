@@ -3,14 +3,18 @@ import swisseph as swe
 from datetime import datetime
 import pytz
 
+# 与 engine 共用同一套 flags 与 swisseph 线程状态，避免过运与本命分属两套基准
+# （此处原先只 set_sid_mode 不设 ephe_path，子线程里会静默退回 MOSEPH）。
+from engine import PLANET_FLAGS, _ensure_swe_state
+
 SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
          'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 
 def calc_transit(lagna_sign_idx, moon_sign_idx, tz_str="Asia/Kolkata"):
     """计算当前过运数据"""
-    swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
-    flags = swe.FLG_SIDEREAL | swe.FLG_SPEED
-    
+    _ensure_swe_state()
+    flags = PLANET_FLAGS
+
     now = datetime.now(pytz.timezone(tz_str))
     utc = now.astimezone(pytz.utc)
     jd = swe.julday(utc.year, utc.month, utc.day, 
@@ -100,8 +104,8 @@ def future_ingress_table(jd_start, years=5):
     逆行导致的回跨也如实记录（同一边界可能出现 进→退→再进 多条）。
     Returns: [{'planet','date','from_sign','to_sign'}, ...] 按日期排序
     """
-    swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
-    flags = swe.FLG_SIDEREAL | swe.FLG_SPEED
+    _ensure_swe_state()
+    flags = PLANET_FLAGS
     bodies = {'Saturn': swe.SATURN, 'Jupiter': swe.JUPITER, 'Rahu': swe.MEAN_NODE}
     events = []
     jd_end = jd_start + years * 365.25

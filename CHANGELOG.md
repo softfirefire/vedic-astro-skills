@@ -8,6 +8,42 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - 2026-09-04
 
+### engine v0.9：D1 星历基准统一 + Vimsottari 年长漂移修复 ⚠️ 有数值变化
+
+**一张盘此前分属两套星历基准。** engine 自算 D1 用 `FLG_SIDEREAL|FLG_SPEED`（65792，视位置），
+而 SAV / D9 / Dasha 等走 PyJHora 的部分用 `drik.PLANET_FLAGS`（66386，真位置 + 无章动 + 无引力偏折）。
+同一张盘的行星表与其余分盘因此差 0~60″。
+
+- 统一到 PyJHora 一侧（`engine.PLANET_FLAGS`）——该侧是当年逐项对照桌面 JHora 验证过的那一半；
+  SKILL_LOG 既有记录：加 `FLG_TRUEPOS` 后七星对桌面从 −15~−59″ 收敛到 ≤1″。
+  实测 `engine.PLANET_FLAGS == drik.PLANET_FLAGS == 66386`，同 jd 同星差 0.000000″。
+- `calc_lagna` **不改**：`houses_ex` 只识别 `FLG_SIDEREAL`，其余位对 Lagna 无效，原写法已等价。
+- `transit.py` 改为复用 `engine.PLANET_FLAGS` 与 `engine._ensure_swe_state()`——消除过运侧的第三套基准，
+  并补上原先缺失的 `set_ephe_path`（该文件此前只设 `set_sid_mode`，子线程里会静默退回 MOSEPH）。
+
+**Vimsottari `year_duration` 是 PyJHora 的模块全局，初值为平均恒星年、仅在 L2 更新为真恒星年。**
+包装层先算 L1 后算 L2 → 第 1 张盘的 L1 用平均年，之后每张盘的 L1 用**上一张盘残留的真年**。
+现在 L1 前显式对齐。26 张回归样本里 21 张的末 MD 结束点受影响。
+
+- `deg_str` 加进位收敛：`x.9959°~x.99999°` 原会产出 `12°60'` 这种非法值；
+  星座末尾不进位到 30°（sign 由 longitude 决定，不跟着走），收敛到 `29°59'`。
+
+**formatter 校验区 8 条无条件 ✅ 改真判定**——原先那些项写死 ✅，等于没校验，报告却写成"已验"。
+新判定全部走**与 engine 不同的推导路径**才算交叉验证：Nakshatra 由经度重算 pada 比对宿主、
+Karaka 独立按度数降序重排比对 DK、D9 用 `(9*sign + pada) % 12` 对撞 engine 的元素起点表、
+Ra-Ke 在 D9 必须恒差 6 座、Ayanamsa 区间、燃烧入列者必须落在 Sun 最宽 orb 内且 Sun 不得自列、
+经度两两不重合、逆行全员 bool 且 Rahu/Ketu 恒 True。
+9 个篡改探针反向测试：8 项确认变红；缺星那项走不到校验区（上游表格已 `KeyError` fail-fast），
+据实标注为结构冗余检查。
+
+- `vedic-prashna/scripts/prashna_time.py`、`vedic-rectifier/scripts/time_scan.py` 同步同一套 flags。
+  后者内联而非 `import engine`，以保住"只依赖 pyswisseph"的独立可跑性——改 engine 常量时必须同步改它。
+
+**⚠️ 输出变化（26 张回归盘，23 张有差异）**：行星 `longitude`/`degree`/`speed` 移动 0~60″，
+`deg_str` 偶尔 ±1′，Karaka 元组里的度数值、燃烧 `distance`、`moon_phase.sun_moon_diff` 随之变，
+末 MD 的 `end`/`end_time` 变。**`sign` / `house` / `nakshatra` / 全部分盘 / Karaka 归属 /
+SAV / BAV / Shadbala 零变化**——精度提升不改变任何离散结论。下游按黄金盘对拍的基线需更新。
+
 ### Parivartana 三分类：Dainya 判据由双侧改为单侧（口径 bug 修复）
 
 - `yogas.md` / `vedic-core/SKILL.md` 的 Dainya 原写作「凶宫互溶：6/8/12 **之间**互换」——

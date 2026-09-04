@@ -23,6 +23,11 @@ from datetime import datetime, timedelta
 
 # === 与 engine.py 一致的配置 ===
 swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
+# 行星位置 flags，与 engine.PLANET_FLAGS / PyJHora drik.PLANET_FLAGS 同值(66386)。
+# 此处内联而非 import engine，是为保住本文件"只依赖 pyswisseph"的独立可跑性；
+# 改 engine 那个常量时必须同步改这里（Moon 的 Nakshatra 边界判定依赖同一基准）。
+PLANET_FLAGS = (swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
+                | swe.FLG_TRUEPOS | swe.FLG_NONUT | swe.FLG_NOGDEFL)
 
 # === 复用 vedic-calculator 的精确 Vimsottari Dasha（两点法用；两 skill 目录平级）===
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -166,7 +171,7 @@ def scan(
         d9, d9_cn = calc_d9(asc_deg)
         d10, d10_cn = calc_d10(asc_deg)
         # Moon sidereal 黄经 → Nakshatra（用绝对 jd，无 tz 问题）
-        moon_lon = swe.calc_ut(jd, swe.MOON, swe.FLG_SIDEREAL)[0][0]
+        moon_lon = swe.calc_ut(jd, swe.MOON, PLANET_FLAGS)[0][0]
         nak_idx = int(moon_lon / (360.0 / 27)) % 27
         moon_nak = NAKSHATRAS[nak_idx]
 

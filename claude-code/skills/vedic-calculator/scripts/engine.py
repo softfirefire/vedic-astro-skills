@@ -1,8 +1,15 @@
 """
-vedic-calculator v0.7 - PyJHora 精确计算引擎
+vedic-calculator v0.9 - PyJHora 精确计算引擎
 基于 pysweph 天文核心 + PyJHora 精确算法（含 9 项 Shadbala bug 修正）
 输出完整的 structured_data 所需数据
 
+v0.9: D1 星历 flags 统一到 PyJHora 的 66386（真位置/无章动/无引力偏折），此前 engine 自算
+      D1 用 65792（视位置），同一张盘的 D1 表与 SAV/D9/Dasha 分属两套基准，实测差 0~60″；
+      Vimsottari year_duration 在 L1 前显式对齐（原先 L1 用平均恒星年或上一张盘的残留值，
+      末 MD 结束点每张盘都偏，实测 21/26）；deg_str 加进位收敛（原会产出 "12°60'"）。
+      ⚠️ 本版有数值变化：行星经度 0~60″、deg_str 偶尔 ±1′、末 MD end/end_time
+v0.8: 去掉 dashaflow 依赖（燃烧/方位强宫两表内联）；sid_mode/ephe_path 改每线程重设；
+      dasha 包装层猴补丁哨兵与其余包装层统一（修常驻进程约 490 盘后 RecursionError）
 v0.7: 增加 D1/D9/D10/D4/D5 报时不确定区间边界审计，区分“算得出”与“输入稳定”
 v0.6: Vimsottari 增加完整 Pratyantardasha 三级运，月级分析不再借用 AD 假精度
 v0.5: 移除所有 dashaflow fallback（错误结果比无结果更糟），fail-fast
@@ -24,12 +31,9 @@ except ImportError as e:                             # 用错python时给可执�
     )
     raise
 from datetime import datetime, timedelta
+import threading
 import pytz
 import json
-
-# dashaflow — 仅用于 dignity/jaimini（这些无 PyJHora bug，不需要修正）
-from dashaflow.dignity import get_dignity, get_compound_relationship, check_combustion, get_digbala
-from dashaflow.jaimini import calculate_jaimini_karakas
 
 # ── PyJHora 精确模块（必须全部加载，否则 fail-fast）──
 _SETUP_HINT = (
@@ -90,14 +94,27 @@ if _missing:
     raise ImportError(f"vedic-calculator 核心模块缺失: {', '.join(_missing)}. 请运行 setup_env.py")
 
 # === 配置 ===
-swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
 # 星历路径：显式指向 skill 自带 ephe（.se1），确保首次 calculate_full_chart 的 calc_ut 就用
 # Swiss 星历。否则 engine 自身从不 set_ephe_path，首盘 calc_planet 在 PyJHora 模块（首次调用
 # 中途才 set_ephe_path）之前跑 → 跌回 Moshier 近似，与后续盘差 ~0.5 角秒（PQ-02 同进程重复
 # 排盘漂移的真根因；产品诊断的 sid_mode 修法经实测无效）。
 _EPHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ephe')
-if os.path.isdir(_EPHE_DIR):
-    swe.set_ephe_path(_EPHE_DIR)
+
+# swisseph 的 sid_mode / ephe_path 都是线程局部状态：只在 import 线程设置一次，
+# 其它线程（产品 API/worker 线程池）里 engine 自算的 D1/Lagna 会退回默认岁差(实测差 0.89°)
+# 且星历退回 Moshier；而 PyJHora 包装层每次调用自带重设，于是同一张盘半盘中毒、看不出来。
+# 故改为每线程首次进入计算时重设一次（threading.local 守门，重复调用零开销）。
+_swe_state = threading.local()
+
+def _ensure_swe_state():
+    if getattr(_swe_state, 'ready', False):
+        return
+    swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
+    if os.path.isdir(_EPHE_DIR):
+        swe.set_ephe_path(_EPHE_DIR)
+    _swe_state.ready = True
+
+_ensure_swe_state()   # import 线程
 
 SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
          'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
@@ -136,6 +153,31 @@ HOUSE_DOMAINS = {
     11:'收入', 12:'损耗'
 }
 
+# 燃烧 orb（度）与方位强宫：原取自 dashaflow.dignity / dashaflow.constants（1.1.0），
+# 为去掉 dashaflow 依赖（其声明依赖已停更的 pyswisseph，安装需 --no-deps 特殊步骤）逐字内联。
+# 数值与判定逻辑与 dashaflow 完全一致，输出零变化。
+COMBUSTION_ORBS = {
+    'Moon': 12, 'Mars': 17, 'Mercury': {'direct': 14, 'retrograde': 12},
+    'Jupiter': 11, 'Venus': {'direct': 10, 'retrograde': 8}, 'Saturn': 15
+}
+DIGBALA_HOUSES = {'Jupiter': 1, 'Mercury': 1, 'Sun': 10, 'Mars': 10, 'Saturn': 7, 'Moon': 4, 'Venus': 4}
+
+def check_combustion(planet_name, planet_lon, sun_lon, is_retrograde=False):
+    """行星是否燃烧（与太阳角距 ≤ orb）。Sun/Rahu/Ketu 不燃烧。"""
+    orb = COMBUSTION_ORBS.get(planet_name)
+    if orb is None:
+        return False
+    if isinstance(orb, dict):
+        orb = orb['retrograde'] if is_retrograde else orb['direct']
+    dist = abs(planet_lon - sun_lon)
+    if dist > 180:
+        dist = 360 - dist
+    return dist <= orb
+
+def get_digbala(planet_name, house):
+    """行星是否落在其方位强宫。"""
+    return DIGBALA_HOUSES.get(planet_name) == house
+
 # === 核心计算函数 ===
 
 def _localize_strict(tz, dt):
@@ -159,32 +201,57 @@ def to_jd(year, month, day, hour, minute, tz_str):
     ut_hour = utc_dt.hour + utc_dt.minute/60.0 + utc_dt.second/3600.0
     return swe.julday(utc_dt.year, utc_dt.month, utc_dt.day, ut_hour)
 
+# 行星位置 flags：与 PyJHora 的 drik.PLANET_FLAGS 逐位一致（实测 66386）。
+# 此前 engine 自算 D1 用 FLG_SIDEREAL|FLG_SPEED(65792)，即视位置(apparent)；
+# 而 SAV/D9/Dasha 等走 PyJHora 的部分用真位置(TRUEPOS)+不含章动/引力偏折，
+# 同一张盘的 D1 表与其余分盘因此分属两套基准，实测差 0~60″。
+# 统一到 PyJHora 一侧：该侧是当年逐项对照桌面 JHora 验证过的那一半。
+# houses_ex 只识别 FLG_SIDEREAL，其余位对 Lagna 无效，故 calc_lagna 保持原样即等价。
+PLANET_FLAGS = (swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
+                | swe.FLG_TRUEPOS | swe.FLG_NONUT | swe.FLG_NOGDEFL)
+
+
+def _deg_min(degree):
+    """星座内度数 → "D°MM'"，带进位收敛。
+
+    直接 round 到分会在 x.9959°~x.99999° 区间产出 "12°60'" 这种非法值；
+    进位到 30° 又会越出星座边界（sign 由 longitude 决定，不会跟着走），
+    故末度只收敛到 29°59'。
+    """
+    d = int(degree)
+    m = round((degree - d) * 60)
+    if m == 60:
+        if d >= 29:
+            m = 59          # 星座末尾：进位会越界成 30°，退回截断
+        else:
+            d += 1
+            m = 0
+    return f"{d}°{m:02d}'"
+
+
 def calc_planet(jd, planet_id):
-    flags = swe.FLG_SIDEREAL | swe.FLG_SPEED
-    result = swe.calc_ut(jd, planet_id, flags)
+    _ensure_swe_state()
+    result = swe.calc_ut(jd, planet_id, PLANET_FLAGS)
     lon = result[0][0]
     speed = result[0][3]
     sign_idx = int(lon / 30)
     degree = lon % 30
-    deg_int = int(degree)
-    min_int = round((degree - deg_int) * 60)
     return {
         'longitude': lon, 'sign': SIGNS[sign_idx], 'sign_idx': sign_idx,
-        'degree': degree, 'deg_str': f"{deg_int}°{min_int:02d}'",
+        'degree': degree, 'deg_str': _deg_min(degree),
         'retrograde': speed < 0, 'speed': speed
     }
 
 def calc_lagna(jd, lat, lon):
+    _ensure_swe_state()
     flags = swe.FLG_SIDEREAL
     cusps, ascmc = swe.houses_ex(jd, lat, lon, b'W', flags)
     asc_lon = ascmc[0]
     sign_idx = int(asc_lon / 30)
     degree = asc_lon % 30
-    deg_int = int(degree)
-    min_int = round((degree - deg_int) * 60)
     return {
         'longitude': asc_lon, 'sign': SIGNS[sign_idx], 'sign_idx': sign_idx,
-        'degree': degree, 'deg_str': f"{deg_int}°{min_int:02d}'"
+        'degree': degree, 'deg_str': _deg_min(degree)
     }
 
 def get_nakshatra(longitude):
@@ -535,9 +602,9 @@ def calc_transits(lagna_sign_idx, moon_sign_idx):
     """
     now = datetime.now()
     jd_now = swe.julday(now.year, now.month, now.day, now.hour + now.minute/60)
-    swe.set_sid_mode(swe.SIDM_TRUE_CITRA)
-    flags = swe.FLG_SIDEREAL | swe.FLG_SPEED
-    
+    _ensure_swe_state()
+    flags = PLANET_FLAGS
+
     transits = {}
     # Slow planets: Saturn, Jupiter, Rahu, Ketu
     slow_planets = {'Saturn': swe.SATURN, 'Jupiter': swe.JUPITER}
@@ -675,6 +742,7 @@ def calc_divisional_boundary_audit(year, month, day, hour, minute, lat, lon,
 def calculate_full_chart(year, month, day, hour, minute, lat, lon,
                          tz_str="Asia/Kolkata", uncertainty_minutes=1):
     """计算完整星盘数据"""
+    _ensure_swe_state()
     jd = to_jd(year, month, day, hour, minute, tz_str)
     ayanamsa = swe.get_ayanamsa_ut(jd)
     
@@ -692,15 +760,14 @@ def calculate_full_chart(year, month, day, hour, minute, lat, lon,
         planets[name] = p
     
     # 3. Rahu & Ketu
-    flags = swe.FLG_SIDEREAL | swe.FLG_SPEED
-    result = swe.calc_ut(jd, swe.MEAN_NODE, flags)
+    result = swe.calc_ut(jd, swe.MEAN_NODE, PLANET_FLAGS)
     rahu_lon = result[0][0]
     rahu_sign_idx = int(rahu_lon / 30)
     rahu_deg = rahu_lon % 30
     planets['Rahu'] = {
         'longitude': rahu_lon, 'sign': SIGNS[rahu_sign_idx],
         'sign_idx': rahu_sign_idx, 'degree': rahu_deg,
-        'deg_str': f"{int(rahu_deg)}°{round((rahu_deg%1)*60):02d}'",
+        'deg_str': _deg_min(rahu_deg),
         'retrograde': True, 'speed': result[0][3],
         'house': get_house(rahu_sign_idx, lagna['sign_idx']),
         'nakshatra': get_nakshatra(rahu_lon)
@@ -711,7 +778,7 @@ def calculate_full_chart(year, month, day, hour, minute, lat, lon,
     planets['Ketu'] = {
         'longitude': ketu_lon, 'sign': SIGNS[ketu_sign_idx],
         'sign_idx': ketu_sign_idx, 'degree': ketu_deg,
-        'deg_str': f"{int(ketu_deg)}°{round((ketu_deg%1)*60):02d}'",
+        'deg_str': _deg_min(ketu_deg),
         'retrograde': True, 'speed': -result[0][3],
         'house': get_house(ketu_sign_idx, lagna['sign_idx']),
         'nakshatra': get_nakshatra(ketu_lon)
@@ -897,9 +964,7 @@ def calculate_full_chart(year, month, day, hour, minute, lat, lon,
     combustion = {}
     for name in ['Moon','Mars','Mercury','Jupiter','Venus','Saturn']:
         is_retro = planets[name]['retrograde']
-        comb_result = check_combustion(name, planets[name]['longitude'], sun_lon, is_retro)
-        is_combust = comb_result if isinstance(comb_result, bool) else comb_result.get('is_combust', False)
-        if is_combust:
+        if check_combustion(name, planets[name]['longitude'], sun_lon, is_retro):
             diff = abs(planets[name]['longitude'] - sun_lon)
             if diff > 180: diff = 360 - diff
             combustion[name] = {'distance': round(diff, 2)}

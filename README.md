@@ -246,7 +246,7 @@ Prashna 只回答一个可观察结果明确的问题，使用问题正式形成
 | Vimshottari Dasha | PyJHora 原生 MD/AD/PD | 统一使用 `[start,end)` 连续区间 |
 | Shadbala | PyJHora + 9 项针对性修正 | 包含 Ishta/Kashta Phala |
 | 分盘 | PyJHora 原生 | 15 张 D1～D60；关键分盘另做输入稳定性审计 |
-| Dignity | dashaflow + 旺/入庙/陷前置判断 | 输出 Compound Relationship |
+| Dignity | 引擎内建 + 旺/入庙/陷前置判断 | 输出 Compound Relationship |
 | Chara Karaka | 7K 主表 + 8K 参考 | 7K 作为 KN Rao 主口径 |
 | 容错 | fail-fast | 缺依赖或关键校验失败时停止，不回退到已知错误算法 |
 
@@ -351,12 +351,11 @@ python3 vedic-astro-skills/skills/vedic-calculator/scripts/setup_env.py
 ```
 
 Codex 或 Claude Code 用户也可以把路径换成对应安装目录中的同名脚本。`setup_env.py`
-会选择兼容的 Python、创建隔离环境、按正确顺序安装十项依赖、补齐星历文件并验证
+会选择兼容的 Python、创建隔离环境、按正确顺序安装依赖、补齐星历文件并验证
 最小 SAV 计算。
 
-> 不要直接执行 `pip install -r requirements.txt`。`dashaflow` 声明依赖已经停更的
-> `pyswisseph`，而当前实现使用 `pysweph`；自动脚本通过正确安装顺序和
-> `--no-deps` 处理冲突。
+> 建议走 `setup_env.py` 而不是直接 `pip install -r requirements.txt`：星历文件下载、
+> 安装顺序和安装后的 SAV 自检都在脚本里，手工安装容易漏掉星历而静默退回低精度模式。
 
 ## ⚡ 快速开始
 

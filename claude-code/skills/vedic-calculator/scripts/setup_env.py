@@ -10,10 +10,9 @@ setup_env.py — vedic-calculator 环境自动搭建脚本
 安装顺序（关键！）：
   1. pysweph>=2.10.3.5     — 提供 swisseph module（社区活跃 fork，有 cp38~cp313 wheel）
   2. PyJHora 隐藏依赖       — numpy, geocoder, geopy, requests, timezonefinder（PyJHora 未声明！）
-  3. dashaflow>=0.3 --no-deps  — 跳过其对已停更的 pyswisseph 的声明依赖
-  4. PyJHora==4.8.6        — SAV/BAV + Shadbala + 分盘
-  5. pytz>=2024.1          — 时区
-  6. 修复 ephemeris 数据    — PyJHora pip 包缺少 .se1 星历文件，从 pysweph 复制
+  3. PyJHora==4.8.6        — SAV/BAV + Shadbala + 分盘
+  4. pytz>=2024.1          — 时区
+  5. 修复 ephemeris 数据    — PyJHora pip 包缺少 .se1 星历文件，从 pysweph 复制
 """
 
 import subprocess
@@ -36,8 +35,7 @@ REQUIRED_PACKAGES = [
     ("requests", "", []),                               # 6. PyJHora 隐藏依赖
     ("timezonefinder", "", []),                         # 7. PyJHora 隐藏依赖
     ("python-dateutil", "", []),                        # 8. PyJHora 隐藏依赖
-    ("dashaflow", ">=0.3", ["--no-deps"]),             # 9. 跳过 pyswisseph 依赖
-    ("PyJHora", "==4.8.6", []),                        # 10. SAV/BAV + Shadbala + 分盘
+    ("PyJHora", "==4.8.6", []),                        # 9. SAV/BAV + Shadbala + 分盘
 ]
 
 MIN_PYTHON = (3, 8)
@@ -244,7 +242,6 @@ def validate(venv_dir):
     # 1. 基础 import 检查
     checks = [
         ("swisseph", "import swisseph as swe; print(swe.version)"),
-        ("dashaflow", "import dashaflow; print('OK')"),
         ("jhora", "import jhora; print('OK')"),
         ("pytz", "import pytz; print('OK')"),
     ]
